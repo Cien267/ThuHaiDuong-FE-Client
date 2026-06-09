@@ -51,7 +51,7 @@ function BrowsePage() {
   const items = all.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const setSearch = (updates: Partial<typeof search>) =>
-    navigate({ search: prev => ({ ...prev, ...updates, page: 1 }) });
+    navigate({ search: (prev: typeof search) => ({ ...prev, ...updates, page: 1 }) });
 
   const hasFilters = !!(search.keyword || search.categorySlug || search.country || search.storyType);
 
