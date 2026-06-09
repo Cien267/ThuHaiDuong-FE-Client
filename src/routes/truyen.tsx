@@ -173,7 +173,7 @@ function BrowsePage() {
               <div className="mt-8 flex items-center justify-center gap-1">
                 <Link
                   to="/truyen"
-                  search={prev => ({ ...prev, page: Math.max(1, page - 1) })}
+                  search={(prev: typeof search) => ({ ...prev, page: Math.max(1, page - 1) })}
                   className="rounded-md border border-border bg-card px-3 py-2 text-sm hover:bg-accent aria-disabled:pointer-events-none aria-disabled:opacity-50"
                   aria-disabled={page === 1}
                 >
@@ -186,7 +186,7 @@ function BrowsePage() {
                       {idx > 0 && arr[idx - 1] !== p - 1 && <span className="px-2 text-muted-foreground">…</span>}
                       <Link
                         to="/truyen"
-                        search={prev => ({ ...prev, page: p })}
+                        search={(prev: typeof search) => ({ ...prev, page: p })}
                         className={`min-w-[40px] rounded-md px-3 py-2 text-center text-sm ${
                           p === page
                             ? "bg-primary text-primary-foreground"
@@ -199,7 +199,7 @@ function BrowsePage() {
                   ))}
                 <Link
                   to="/truyen"
-                  search={prev => ({ ...prev, page: Math.min(totalPages, page + 1) })}
+                  search={(prev: typeof search) => ({ ...prev, page: Math.min(totalPages, page + 1) })}
                   className="rounded-md border border-border bg-card px-3 py-2 text-sm hover:bg-accent aria-disabled:pointer-events-none aria-disabled:opacity-50"
                   aria-disabled={page === totalPages}
                 >
