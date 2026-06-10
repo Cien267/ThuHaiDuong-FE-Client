@@ -1,57 +1,186 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useState } from "react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
-import { STORIES, STATUS_LABEL, formatViews } from "@/features/stories/mock-data";
+import type { StorySummary } from "@/features/stories/types";
+import { STORIES, STATUS_LABEL, COUNTRY_LABEL, formatViews } from "@/features/stories/mock-data";
+import { getChaptersForStory } from "@/features/stories/chapters";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Star, Eye, Bookmark } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { BookOpen, Star, Eye, Bookmark, Clock, ListOrdered, Search, ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/truyen/$slug")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `Truyện ${params.slug} — Truyện Việt` },
-      { name: "description", content: "Đọc truyện online miễn phí." },
-    ],
-  }),
-  component: StoryDetailStub,
+  head: ({ params }) => {
+    const story = STORIES.find(s => s.slug === params.slug);
+    const title = story ? `${story.title} — ${story.authorName}` : "Truyện";
+    const desc = story?.description?.slice(0, 160) ?? "Đọc truyện online miễn phí.";
+    return {
+      meta: [
+        { title: `${title} | Truyện Việt` },
+        { name: "description", content: desc },
+        { property: "og:title", content: title },
+        { property: "og:description", content: desc },
+        ...(story?.coverImageUrl ? [{ property: "og:image", content: story.coverImageUrl }] : []),
+      ],
+    };
+  },
+  loader: ({ params }) => {
+    const story = STORIES.find(s => s.slug === params.slug);
+    if (!story) throw notFound();
+    return { story };
+  },
+  notFoundComponent: () => (
+    <div className="container mx-auto px-4 py-20 text-center">
+      <h1 className="text-2xl font-bold">Không tìm thấy truyện</h1>
+      <Link to="/truyen" className="text-primary underline">← Quay lại danh sách</Link>
+    </div>
+  ),
+  component: StoryDetailPage,
 });
 
-function StoryDetailStub() {
-  const { slug } = Route.useParams();
-  const story = STORIES.find(s => s.slug === slug) ?? STORIES[0];
+const CHAPTERS_PER_PAGE = 50;
+
+function StoryDetailPage() {
+  const { story } = Route.useLoaderData() as { story: StorySummary };
+  const allChapters = getChaptersForStory(story.slug);
+  const [keyword, setKeyword] = useState("");
+  const [page, setPage] = useState(1);
+  const [order, setOrder] = useState<"asc" | "desc">("asc");
+
+  const filtered = keyword
+    ? allChapters.filter(c => c.title.toLowerCase().includes(keyword.toLowerCase()) || String(c.number).includes(keyword))
+    : allChapters;
+  const ordered = order === "asc" ? filtered : [...filtered].reverse();
+  const totalPages = Math.max(1, Math.ceil(ordered.length / CHAPTERS_PER_PAGE));
+  const pageItems = ordered.slice((page - 1) * CHAPTERS_PER_PAGE, page * CHAPTERS_PER_PAGE);
+
+  const firstChapter = allChapters[0];
+  const latestChapter = allChapters[allChapters.length - 1];
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <SiteHeader />
-      <main className="container mx-auto flex-1 px-4 py-8">
-        <div className="grid gap-6 md:grid-cols-[240px_1fr]">
-          <img src={story.coverImageUrl ?? ""} alt={story.title} className="h-auto w-full rounded-lg border border-border" />
-          <div>
-            <h1 className="text-2xl font-bold md:text-3xl">{story.title}</h1>
-            <p className="mt-1 text-muted-foreground">Tác giả: {story.authorName}</p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {story.categories.map(c => (
-                <Badge key={c.id} variant="secondary">{c.name}</Badge>
-              ))}
-              <Badge>{STATUS_LABEL[story.status]}</Badge>
+      <main className="flex-1">
+        {/* Header section */}
+        <section className="border-b border-border bg-gradient-to-br from-primary/5 via-background to-accent/20">
+          <div className="container mx-auto px-4 py-8">
+            <nav className="mb-4 text-sm text-muted-foreground">
+              <Link to="/" className="hover:text-foreground">Trang chủ</Link>
+              <span className="mx-2">/</span>
+              <Link to="/truyen" className="hover:text-foreground">Truyện</Link>
+              <span className="mx-2">/</span>
+              <span className="text-foreground">{story.title}</span>
+            </nav>
+            <div className="grid gap-6 md:grid-cols-[220px_1fr]">
+              <img
+                src={story.coverImageUrl ?? ""}
+                alt={story.title}
+                className="aspect-[5/7] w-full max-w-[220px] rounded-lg border border-border object-cover shadow-md"
+              />
+              <div>
+                <h1 className="text-2xl font-bold md:text-3xl">{story.title}</h1>
+                <p className="mt-2 text-muted-foreground">
+                  Tác giả: <span className="text-foreground">{story.authorName}</span>
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {story.categories.map(c => (
+                    <Badge key={c.id} variant="secondary">{c.name}</Badge>
+                  ))}
+                  <Badge>{STATUS_LABEL[story.status]}</Badge>
+                  <Badge variant="outline">{COUNTRY_LABEL[story.country] ?? story.country}</Badge>
+                </div>
+                <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  <Stat icon={<Eye className="h-4 w-4" />} label="Lượt đọc" value={formatViews(story.totalViews)} />
+                  <Stat icon={<Star className="h-4 w-4 fill-amber-400 text-amber-400" />} label="Đánh giá" value={`${story.averageRating} (${story.ratingCount})`} />
+                  <Stat icon={<BookOpen className="h-4 w-4" />} label="Số chương" value={String(story.totalChapters)} />
+                  <Stat icon={<Clock className="h-4 w-4" />} label="Cập nhật" value={new Date(story.lastChapterAt ?? Date.now()).toLocaleDateString("vi-VN")} />
+                </div>
+                <div className="mt-6 flex flex-wrap gap-3">
+                  {firstChapter && (
+                    <Button asChild>
+                      <Link to="/truyen/$slug/chuong-$number" params={{ slug: story.slug, number: String(firstChapter.number) }}>
+                        <BookOpen className="mr-2 h-4 w-4" /> Đọc từ đầu
+                      </Link>
+                    </Button>
+                  )}
+                  {latestChapter && (
+                    <Button asChild variant="secondary">
+                      <Link to="/truyen/$slug/chuong-$number" params={{ slug: story.slug, number: String(latestChapter.number) }}>
+                        Chương mới nhất <ChevronRight className="ml-1 h-4 w-4" />
+                      </Link>
+                    </Button>
+                  )}
+                  <Button variant="outline"><Bookmark className="mr-2 h-4 w-4" /> Đánh dấu</Button>
+                </div>
+              </div>
             </div>
-            <div className="mt-4 flex flex-wrap gap-4 text-sm text-muted-foreground">
-              <span className="inline-flex items-center gap-1"><Eye className="h-4 w-4" /> {formatViews(story.totalViews)}</span>
-              <span className="inline-flex items-center gap-1"><Star className="h-4 w-4 fill-amber-400 text-amber-400" /> {story.averageRating} ({story.ratingCount})</span>
-              <span className="inline-flex items-center gap-1"><BookOpen className="h-4 w-4" /> {story.totalChapters} chương</span>
-            </div>
-            <p className="mt-4 text-foreground/90">{story.description}</p>
-            <div className="mt-6 flex gap-3">
-              <Button><BookOpen className="mr-2 h-4 w-4" /> Đọc từ đầu</Button>
-              <Button variant="outline"><Bookmark className="mr-2 h-4 w-4" /> Đánh dấu</Button>
-            </div>
-            <p className="mt-6 rounded-md border border-dashed border-border bg-muted/30 p-4 text-sm text-muted-foreground">
-              Chi tiết truyện, danh sách chương, đánh giá và bình luận sẽ được hoàn thiện ở bước tiếp theo. <Link to="/truyen" className="text-primary underline">← Quay lại danh sách</Link>
-            </p>
           </div>
-        </div>
+        </section>
+
+        {/* Description */}
+        <section className="container mx-auto px-4 py-8">
+          <h2 className="mb-3 text-lg font-semibold">Giới thiệu</h2>
+          <p className="whitespace-pre-line leading-relaxed text-foreground/90">{story.description}</p>
+        </section>
+
+        {/* Chapter list */}
+        <section className="container mx-auto px-4 pb-12">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <h2 className="flex items-center gap-2 text-lg font-semibold">
+              <ListOrdered className="h-5 w-5" /> Danh sách chương ({allChapters.length})
+            </h2>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="relative">
+                <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Tìm chương..."
+                  value={keyword}
+                  onChange={e => { setKeyword(e.target.value); setPage(1); }}
+                  className="w-56 pl-8"
+                />
+              </div>
+              <Button variant="outline" size="sm" onClick={() => setOrder(o => o === "asc" ? "desc" : "asc")}>
+                Sắp xếp: {order === "asc" ? "Cũ → Mới" : "Mới → Cũ"}
+              </Button>
+            </div>
+          </div>
+
+          <div className="grid gap-1 rounded-lg border border-border bg-card p-2 sm:grid-cols-2 lg:grid-cols-3">
+            {pageItems.map(ch => (
+              <Link
+                key={ch.number}
+                to="/truyen/$slug/chuong-$number"
+                params={{ slug: story.slug, number: String(ch.number) }}
+                className="flex items-center justify-between rounded px-3 py-2 text-sm hover:bg-accent"
+              >
+                <span className="truncate">{ch.title}</span>
+                <span className="ml-2 shrink-0 text-xs text-muted-foreground">
+                  {new Date(ch.publishedAt).toLocaleDateString("vi-VN")}
+                </span>
+              </Link>
+            ))}
+          </div>
+
+          {totalPages > 1 && (
+            <div className="mt-4 flex items-center justify-center gap-2">
+              <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(p => p - 1)}>Trước</Button>
+              <span className="text-sm text-muted-foreground">Trang {page} / {totalPages}</span>
+              <Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage(p => p + 1)}>Sau</Button>
+            </div>
+          )}
+        </section>
       </main>
       <SiteFooter />
+    </div>
+  );
+}
+
+function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return (
+    <div className="rounded-md border border-border bg-card/60 p-3">
+      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">{icon} {label}</div>
+      <div className="mt-1 text-sm font-semibold">{value}</div>
     </div>
   );
 }
