@@ -41,10 +41,6 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/truyen/$slug/chuong-$number")({
-  params: {
-    parse: (raw) => ({ slug: String(raw.slug), number: String(raw.number) }),
-    stringify: (p) => ({ slug: p.slug, number: String(p.number) }),
-  },
   head: ({ params }) => {
     const ch = getChapter(params.slug, Number(params.number));
     const title = ch ? `${ch.title} - ${ch.storyTitle}` : "Đọc chương";

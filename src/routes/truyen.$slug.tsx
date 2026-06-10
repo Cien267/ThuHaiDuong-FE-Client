@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import type { StorySummary } from "@/features/stories/types";
 import { STORIES, STATUS_LABEL, COUNTRY_LABEL, formatViews } from "@/features/stories/mock-data";
 import { getChaptersForStory } from "@/features/stories/chapters";
 import { Badge } from "@/components/ui/badge";
@@ -41,7 +42,7 @@ export const Route = createFileRoute("/truyen/$slug")({
 const CHAPTERS_PER_PAGE = 50;
 
 function StoryDetailPage() {
-  const { story } = Route.useLoaderData();
+  const { story } = Route.useLoaderData() as { story: StorySummary };
   const allChapters = getChaptersForStory(story.slug);
   const [keyword, setKeyword] = useState("");
   const [page, setPage] = useState(1);
