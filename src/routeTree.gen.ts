@@ -36,9 +36,9 @@ const TruyenSlugIndexRoute = TruyenSlugIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const TruyenSlugChuongNumberRoute = TruyenSlugChuongNumberRouteImport.update({
-  id: '/chuong-$number',
-  path: '/chuong-$number',
-  getParentRoute: () => TruyenSlugRoute,
+  id: '/truyen/$slug/chuong-$number',
+  path: '/truyen/$slug/chuong-$number',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -91,6 +91,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DangNhapRoute: typeof DangNhapRoute
   TruyenIndexRoute: typeof TruyenIndexRoute
+  TruyenSlugChuongNumberRoute: typeof TruyenSlugChuongNumberRoute
   TruyenSlugIndexRoute: typeof TruyenSlugIndexRoute
 }
 
@@ -126,10 +127,10 @@ declare module '@tanstack/react-router' {
     }
     '/truyen/$slug/chuong-$number': {
       id: '/truyen/$slug/chuong-$number'
-      path: '/chuong-$number'
+      path: '/truyen/$slug/chuong-$number'
       fullPath: '/truyen/$slug/chuong-$number'
       preLoaderRoute: typeof TruyenSlugChuongNumberRouteImport
-      parentRoute: typeof TruyenSlugRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -138,6 +139,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DangNhapRoute: DangNhapRoute,
   TruyenIndexRoute: TruyenIndexRoute,
+  TruyenSlugChuongNumberRoute: TruyenSlugChuongNumberRoute,
   TruyenSlugIndexRoute: TruyenSlugIndexRoute,
 }
 export const routeTree = rootRouteImport
