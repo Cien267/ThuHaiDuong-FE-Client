@@ -13,7 +13,7 @@ import { Route as DangNhapRouteImport } from './routes/dang-nhap'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TruyenIndexRouteImport } from './routes/truyen.index'
 import { Route as TruyenSlugIndexRouteImport } from './routes/truyen.$slug.index'
-import { Route as TruyenSlugChuongNumberRouteImport } from './routes/truyen.$slug.chuong-$number'
+import { Route as TruyenSlugChuongChar123numberChar125RouteImport } from './routes/truyen.$slug.chuong-{$number}'
 
 const DangNhapRoute = DangNhapRouteImport.update({
   id: '/dang-nhap',
@@ -35,24 +35,25 @@ const TruyenSlugIndexRoute = TruyenSlugIndexRouteImport.update({
   path: '/truyen/$slug/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TruyenSlugChuongNumberRoute = TruyenSlugChuongNumberRouteImport.update({
-  id: '/truyen/$slug/chuong-$number',
-  path: '/truyen/$slug/chuong-$number',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const TruyenSlugChuongChar123numberChar125Route =
+  TruyenSlugChuongChar123numberChar125RouteImport.update({
+    id: '/truyen/$slug/chuong-{$number}',
+    path: '/truyen/$slug/chuong-{$number}',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dang-nhap': typeof DangNhapRoute
   '/truyen/': typeof TruyenIndexRoute
-  '/truyen/$slug/chuong-$number': typeof TruyenSlugChuongNumberRoute
+  '/truyen/$slug/chuong-{$number}': typeof TruyenSlugChuongChar123numberChar125Route
   '/truyen/$slug/': typeof TruyenSlugIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dang-nhap': typeof DangNhapRoute
   '/truyen': typeof TruyenIndexRoute
-  '/truyen/$slug/chuong-$number': typeof TruyenSlugChuongNumberRoute
+  '/truyen/$slug/chuong-{$number}': typeof TruyenSlugChuongChar123numberChar125Route
   '/truyen/$slug': typeof TruyenSlugIndexRoute
 }
 export interface FileRoutesById {
@@ -60,7 +61,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/dang-nhap': typeof DangNhapRoute
   '/truyen/': typeof TruyenIndexRoute
-  '/truyen/$slug/chuong-$number': typeof TruyenSlugChuongNumberRoute
+  '/truyen/$slug/chuong-{$number}': typeof TruyenSlugChuongChar123numberChar125Route
   '/truyen/$slug/': typeof TruyenSlugIndexRoute
 }
 export interface FileRouteTypes {
@@ -69,21 +70,21 @@ export interface FileRouteTypes {
     | '/'
     | '/dang-nhap'
     | '/truyen/'
-    | '/truyen/$slug/chuong-$number'
+    | '/truyen/$slug/chuong-{$number}'
     | '/truyen/$slug/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/dang-nhap'
     | '/truyen'
-    | '/truyen/$slug/chuong-$number'
+    | '/truyen/$slug/chuong-{$number}'
     | '/truyen/$slug'
   id:
     | '__root__'
     | '/'
     | '/dang-nhap'
     | '/truyen/'
-    | '/truyen/$slug/chuong-$number'
+    | '/truyen/$slug/chuong-{$number}'
     | '/truyen/$slug/'
   fileRoutesById: FileRoutesById
 }
@@ -91,7 +92,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DangNhapRoute: typeof DangNhapRoute
   TruyenIndexRoute: typeof TruyenIndexRoute
-  TruyenSlugChuongNumberRoute: typeof TruyenSlugChuongNumberRoute
+  TruyenSlugChuongChar123numberChar125Route: typeof TruyenSlugChuongChar123numberChar125Route
   TruyenSlugIndexRoute: typeof TruyenSlugIndexRoute
 }
 
@@ -125,11 +126,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TruyenSlugIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/truyen/$slug/chuong-$number': {
-      id: '/truyen/$slug/chuong-$number'
-      path: '/truyen/$slug/chuong-$number'
-      fullPath: '/truyen/$slug/chuong-$number'
-      preLoaderRoute: typeof TruyenSlugChuongNumberRouteImport
+    '/truyen/$slug/chuong-{$number}': {
+      id: '/truyen/$slug/chuong-{$number}'
+      path: '/truyen/$slug/chuong-{$number}'
+      fullPath: '/truyen/$slug/chuong-{$number}'
+      preLoaderRoute: typeof TruyenSlugChuongChar123numberChar125RouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -139,7 +140,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DangNhapRoute: DangNhapRoute,
   TruyenIndexRoute: TruyenIndexRoute,
-  TruyenSlugChuongNumberRoute: TruyenSlugChuongNumberRoute,
+  TruyenSlugChuongChar123numberChar125Route:
+    TruyenSlugChuongChar123numberChar125Route,
   TruyenSlugIndexRoute: TruyenSlugIndexRoute,
 }
 export const routeTree = rootRouteImport

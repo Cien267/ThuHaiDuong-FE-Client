@@ -144,14 +144,14 @@ function StoryDetailPage() {
                 <div className="mt-6 flex flex-wrap gap-3">
                   {firstChapter && (
                     <Button asChild>
-                      <Link to="/truyen/$slug/chuong-$number" params={{ slug: story.slug, number: String(firstChapter.number) }}>
+                      <Link to="/truyen/$slug/chuong-{$number}" params={{ slug: story.slug, number: String(firstChapter.number) }}>
                         <BookOpen className="mr-2 h-4 w-4" /> Đọc từ đầu
                       </Link>
                     </Button>
                   )}
                   {latestChapter && (
                     <Button asChild variant="secondary">
-                      <Link to="/truyen/$slug/chuong-$number" params={{ slug: story.slug, number: String(latestChapter.number) }}>
+                      <Link to="/truyen/$slug/chuong-{$number}" params={{ slug: story.slug, number: String(latestChapter.number) }}>
                         Chương mới nhất <ChevronRight className="ml-1 h-4 w-4" />
                       </Link>
                     </Button>
@@ -209,7 +209,7 @@ function StoryDetailPage() {
               {pageItems.map(ch => (
                 <Link
                   key={ch.number}
-                  to="/truyen/$slug/chuong-$number"
+                  to="/truyen/$slug/chuong-{$number}"
                   params={{ slug: story.slug, number: String(ch.number) }}
                   className="flex items-center justify-between rounded px-3 py-2 text-sm hover:bg-accent"
                 >

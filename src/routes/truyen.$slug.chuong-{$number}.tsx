@@ -42,7 +42,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 
-export const Route = createFileRoute("/truyen/$slug/chuong-$number")({
+export const Route = createFileRoute("/truyen/$slug/chuong-{$number}")({
   head: ({ params }) => {
     const ch = getChapter(params.slug, Number(params.number));
     const title = ch ? `${ch.title} - ${ch.storyTitle}` : "Đọc chương";
@@ -87,7 +87,7 @@ function ChapterReaderPage() {
 
   const goTo = (n: number | null) => {
     if (n == null) return;
-    navigate({ to: "/truyen/$slug/chuong-$number", params: { slug, number: String(n) } });
+    navigate({ to: "/truyen/$slug/chuong-{$number}", params: { slug, number: String(n) } });
     window.scrollTo({ top: 0 });
   };
 
@@ -259,7 +259,7 @@ function ChapterListSheet({ storySlug, currentNumber }: { storySlug: string; cur
               {chapters.map(c => (
                 <li key={c.number}>
                   <Link
-                    to="/truyen/$slug/chuong-$number"
+                    to="/truyen/$slug/chuong-{$number}"
                     params={{ slug: storySlug, number: String(c.number) }}
                     className={`block rounded px-3 py-2 text-sm hover:bg-accent ${c.number === currentNumber ? "bg-accent font-semibold" : ""}`}
                   >
