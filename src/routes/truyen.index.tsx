@@ -37,7 +37,7 @@ export const Route = createFileRoute("/truyen/")({
 
 function BrowsePage() {
   const search = Route.useSearch();
-  const navigate = useNavigate({ from: "/truyen" });
+  const navigate = useNavigate({ from: "/truyen/" });
 
   const listQ = useQuery(
     storiesQuery({
