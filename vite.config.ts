@@ -12,4 +12,15 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  vite: {
+    server: {
+      // Proxy API trong dev: /api → backend .NET local (tránh CORS)
+      proxy: {
+        "/api": {
+          target: "http://localhost:5129",
+          changeOrigin: true,
+        },
+      },
+    },
+  },
 });
