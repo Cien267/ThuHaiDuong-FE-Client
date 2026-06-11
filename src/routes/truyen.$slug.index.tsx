@@ -1,16 +1,16 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
-import type { StorySummary } from "@/features/stories/types";
 import { STORIES, STATUS_LABEL, COUNTRY_LABEL, formatViews } from "@/features/stories/mock-data";
-import { getChaptersForStory } from "@/features/stories/chapters";
+import { storyQuery, chaptersQuery } from "@/features/stories/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { BookOpen, Star, Eye, Bookmark, Clock, ListOrdered, Search, ChevronRight } from "lucide-react";
+import { BookOpen, Star, Eye, Bookmark, Clock, ListOrdered, Search, ChevronRight, RefreshCw } from "lucide-react";
 
-export const Route = createFileRoute("/truyen/$slug")({
+export const Route = createFileRoute("/truyen/$slug/")({
   head: ({ params }) => {
     const story = STORIES.find(s => s.slug === params.slug);
     const title = story ? `${story.title} — ${story.authorName}` : "Truyện";
@@ -25,28 +25,73 @@ export const Route = createFileRoute("/truyen/$slug")({
       ],
     };
   },
-  loader: ({ params }) => {
-    const story = STORIES.find(s => s.slug === params.slug);
-    if (!story) throw notFound();
-    return { story };
-  },
-  notFoundComponent: () => (
-    <div className="container mx-auto px-4 py-20 text-center">
-      <h1 className="text-2xl font-bold">Không tìm thấy truyện</h1>
-      <Link to="/truyen" className="text-primary underline">← Quay lại danh sách</Link>
-    </div>
-  ),
+  notFoundComponent: NotFoundView,
   component: StoryDetailPage,
 });
 
 const CHAPTERS_PER_PAGE = 50;
 
+function NotFoundView() {
+  return (
+    <div className="flex min-h-screen flex-col bg-background">
+      <SiteHeader />
+      <div className="container mx-auto flex-1 px-4 py-20 text-center">
+        <h1 className="text-2xl font-bold">Không tìm thấy truyện</h1>
+        <Link to="/truyen" className="text-primary underline">← Quay lại danh sách</Link>
+      </div>
+      <SiteFooter />
+    </div>
+  );
+}
+
 function StoryDetailPage() {
-  const { story } = Route.useLoaderData() as { story: StorySummary };
-  const allChapters = getChaptersForStory(story.slug);
+  const { slug } = Route.useParams();
+  const storyQ = useQuery(storyQuery(slug));
+  const chaptersQ = useQuery(chaptersQuery(slug));
+
   const [keyword, setKeyword] = useState("");
   const [page, setPage] = useState(1);
   const [order, setOrder] = useState<"asc" | "desc">("asc");
+
+  if (storyQ.isPending) {
+    return (
+      <div className="flex min-h-screen flex-col bg-background">
+        <SiteHeader />
+        <div className="container mx-auto flex-1 px-4 py-8">
+          <div className="grid gap-6 md:grid-cols-[220px_1fr]">
+            <div className="aspect-[5/7] w-full max-w-[220px] animate-pulse rounded-lg bg-muted/60" />
+            <div className="space-y-4">
+              <div className="h-8 w-2/3 animate-pulse rounded bg-muted/60" />
+              <div className="h-4 w-1/3 animate-pulse rounded bg-muted/60" />
+              <div className="h-24 animate-pulse rounded bg-muted/50" />
+            </div>
+          </div>
+        </div>
+        <SiteFooter />
+      </div>
+    );
+  }
+
+  if (storyQ.isError) {
+    return (
+      <div className="flex min-h-screen flex-col bg-background">
+        <SiteHeader />
+        <div className="container mx-auto flex-1 px-4 py-20 text-center">
+          <h1 className="text-2xl font-bold">Không tải được truyện</h1>
+          <p className="mt-2 text-muted-foreground">{(storyQ.error as Error)?.message}</p>
+          <Button variant="outline" className="mt-4" onClick={() => storyQ.refetch()}>
+            <RefreshCw className="mr-2 h-4 w-4" /> Thử lại
+          </Button>
+        </div>
+        <SiteFooter />
+      </div>
+    );
+  }
+
+  const story = storyQ.data;
+  if (!story) return <NotFoundView />;
+
+  const allChapters = chaptersQ.data ?? [];
 
   const filtered = keyword
     ? allChapters.filter(c => c.title.toLowerCase().includes(keyword.toLowerCase()) || String(c.number).includes(keyword))
@@ -99,14 +144,14 @@ function StoryDetailPage() {
                 <div className="mt-6 flex flex-wrap gap-3">
                   {firstChapter && (
                     <Button asChild>
-                      <Link to="/truyen/$slug/chuong-$number" params={{ slug: story.slug, number: String(firstChapter.number) }}>
+                      <Link to="/truyen/$slug/chuong-{$number}" params={{ slug: story.slug, number: String(firstChapter.number) }}>
                         <BookOpen className="mr-2 h-4 w-4" /> Đọc từ đầu
                       </Link>
                     </Button>
                   )}
                   {latestChapter && (
                     <Button asChild variant="secondary">
-                      <Link to="/truyen/$slug/chuong-$number" params={{ slug: story.slug, number: String(latestChapter.number) }}>
+                      <Link to="/truyen/$slug/chuong-{$number}" params={{ slug: story.slug, number: String(latestChapter.number) }}>
                         Chương mới nhất <ChevronRight className="ml-1 h-4 w-4" />
                       </Link>
                     </Button>
@@ -146,21 +191,36 @@ function StoryDetailPage() {
             </div>
           </div>
 
-          <div className="grid gap-1 rounded-lg border border-border bg-card p-2 sm:grid-cols-2 lg:grid-cols-3">
-            {pageItems.map(ch => (
-              <Link
-                key={ch.number}
-                to="/truyen/$slug/chuong-$number"
-                params={{ slug: story.slug, number: String(ch.number) }}
-                className="flex items-center justify-between rounded px-3 py-2 text-sm hover:bg-accent"
-              >
-                <span className="truncate">{ch.title}</span>
-                <span className="ml-2 shrink-0 text-xs text-muted-foreground">
-                  {new Date(ch.publishedAt).toLocaleDateString("vi-VN")}
-                </span>
-              </Link>
-            ))}
-          </div>
+          {chaptersQ.isPending ? (
+            <div className="grid gap-1 rounded-lg border border-border bg-card p-2 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 12 }, (_, i) => (
+                <div key={i} className="h-9 animate-pulse rounded bg-muted/50" />
+              ))}
+            </div>
+          ) : chaptersQ.isError ? (
+            <div className="rounded-lg border border-dashed border-destructive/50 bg-card py-10 text-center">
+              <p className="text-muted-foreground">Không tải được danh sách chương.</p>
+              <Button variant="outline" size="sm" className="mt-3" onClick={() => chaptersQ.refetch()}>
+                <RefreshCw className="mr-2 h-4 w-4" /> Thử lại
+              </Button>
+            </div>
+          ) : (
+            <div className="grid gap-1 rounded-lg border border-border bg-card p-2 sm:grid-cols-2 lg:grid-cols-3">
+              {pageItems.map(ch => (
+                <Link
+                  key={ch.number}
+                  to="/truyen/$slug/chuong-{$number}"
+                  params={{ slug: story.slug, number: String(ch.number) }}
+                  className="flex items-center justify-between rounded px-3 py-2 text-sm hover:bg-accent"
+                >
+                  <span className="truncate">{ch.title}</span>
+                  <span className="ml-2 shrink-0 text-xs text-muted-foreground">
+                    {new Date(ch.publishedAt).toLocaleDateString("vi-VN")}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          )}
 
           {totalPages > 1 && (
             <div className="mt-4 flex items-center justify-center gap-2">

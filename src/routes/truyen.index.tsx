@@ -1,13 +1,15 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { StoryCard } from "@/features/stories/components/StoryCard";
-import { CATEGORIES, COUNTRY_LABEL, filterStories } from "@/features/stories/mock-data";
+import { CATEGORIES, COUNTRY_LABEL } from "@/features/stories/mock-data";
+import { storiesQuery } from "@/features/stories/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { X } from "lucide-react";
+import { X, RefreshCw } from "lucide-react";
 
 const searchSchema = z.object({
   keyword: fallback(z.string(), "").default(""),
@@ -21,7 +23,7 @@ const searchSchema = z.object({
 
 const PAGE_SIZE = 12;
 
-export const Route = createFileRoute("/truyen")({
+export const Route = createFileRoute("/truyen/")({
   validateSearch: zodValidator(searchSchema),
   head: () => ({
     meta: [
@@ -35,20 +37,25 @@ export const Route = createFileRoute("/truyen")({
 
 function BrowsePage() {
   const search = Route.useSearch();
-  const navigate = useNavigate({ from: "/truyen" });
+  const navigate = useNavigate({ from: "/truyen/" });
 
-  const all = filterStories({
-    keyword: search.keyword || undefined,
-    categorySlug: search.categorySlug || undefined,
-    country: search.country || undefined,
-    storyType: search.storyType || undefined,
-    sortBy: search.sortBy,
-    sortDesc: search.sortDesc,
-  });
+  const listQ = useQuery(
+    storiesQuery({
+      keyword: search.keyword || undefined,
+      categorySlug: search.categorySlug || undefined,
+      country: search.country || undefined,
+      storyType: search.storyType || undefined,
+      sortBy: search.sortBy,
+      sortDesc: search.sortDesc,
+      page: search.page,
+      pageSize: PAGE_SIZE,
+    }),
+  );
 
-  const totalPages = Math.max(1, Math.ceil(all.length / PAGE_SIZE));
+  const items = listQ.data?.items ?? [];
+  const totalCount = listQ.data?.totalCount ?? 0;
+  const totalPages = listQ.data?.totalPages ?? 1;
   const page = Math.min(search.page, totalPages);
-  const items = all.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const setSearch = (updates: Partial<typeof search>) =>
     navigate({ search: (prev: typeof search) => ({ ...prev, ...updates, page: 1 }) });
@@ -63,7 +70,11 @@ function BrowsePage() {
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-foreground md:text-3xl">Danh sách truyện</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Tìm thấy <span className="font-medium text-foreground">{all.length}</span> truyện
+            {listQ.isPending ? (
+              "Đang tải..."
+            ) : (
+              <>Tìm thấy <span className="font-medium text-foreground">{totalCount}</span> truyện</>
+            )}
           </p>
         </div>
 
@@ -158,12 +169,27 @@ function BrowsePage() {
               ))}
             </div>
 
-            {items.length === 0 ? (
+            {listQ.isPending ? (
+              <div className="grid gap-4 sm:grid-cols-2">
+                {Array.from({ length: PAGE_SIZE }, (_, i) => (
+                  <div key={i} className="h-44 animate-pulse rounded-lg border border-border bg-muted/50" />
+                ))}
+              </div>
+            ) : listQ.isError ? (
+              <div className="rounded-lg border border-dashed border-destructive/50 bg-card py-20 text-center">
+                <p className="text-base text-muted-foreground">
+                  Không tải được danh sách truyện. {(listQ.error as Error)?.message}
+                </p>
+                <Button variant="outline" size="sm" className="mt-4" onClick={() => listQ.refetch()}>
+                  <RefreshCw className="mr-2 h-4 w-4" /> Thử lại
+                </Button>
+              </div>
+            ) : items.length === 0 ? (
               <div className="rounded-lg border border-dashed border-border bg-card py-20 text-center">
                 <p className="text-base text-muted-foreground">Không tìm thấy truyện nào phù hợp.</p>
               </div>
             ) : (
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className={`grid gap-4 sm:grid-cols-2 ${listQ.isFetching ? "opacity-70" : ""}`}>
                 {items.map(s => <StoryCard key={s.id} story={s} />)}
               </div>
             )}

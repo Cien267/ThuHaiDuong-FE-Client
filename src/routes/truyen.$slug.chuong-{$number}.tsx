@@ -1,6 +1,8 @@
-import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
-import { getChapter, getChaptersForStory } from "@/features/stories/chapters";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useMemo } from "react";
+import { getChapter } from "@/features/stories/chapters";
+import { chapterQuery, chaptersQuery } from "@/features/stories/api";
 import { sanitizeChapterHtml } from "@/features/reader/sanitize";
 import {
   useReaderSettings,
@@ -36,11 +38,11 @@ import {
   Settings2,
   List,
   Home,
-  BookOpen,
   ArrowUp,
+  RefreshCw,
 } from "lucide-react";
 
-export const Route = createFileRoute("/truyen/$slug/chuong-$number")({
+export const Route = createFileRoute("/truyen/$slug/chuong-{$number}")({
   head: ({ params }) => {
     const ch = getChapter(params.slug, Number(params.number));
     const title = ch ? `${ch.title} - ${ch.storyTitle}` : "Đọc chương";
@@ -51,36 +53,41 @@ export const Route = createFileRoute("/truyen/$slug/chuong-$number")({
       ],
     };
   },
-  loader: ({ params }) => {
-    const num = Number(params.number);
-    if (!Number.isFinite(num) || num < 1) throw notFound();
-    const chapter = getChapter(params.slug, num);
-    if (!chapter) throw notFound();
-    return { chapter };
-  },
-  notFoundComponent: () => (
+  notFoundComponent: NotFoundView,
+  component: ChapterReaderPage,
+});
+
+function NotFoundView() {
+  return (
     <div className="container mx-auto px-4 py-20 text-center">
       <h1 className="text-2xl font-bold">Không tìm thấy chương</h1>
       <Link to="/" className="text-primary underline">← Về trang chủ</Link>
     </div>
-  ),
-  component: ChapterReaderPage,
-});
+  );
+}
 
 function ChapterReaderPage() {
-  const { chapter } = Route.useLoaderData();
-  const { slug } = Route.useParams();
+  const { slug, number } = Route.useParams();
+  const num = Number(number);
+  const validNumber = Number.isFinite(num) && num >= 1;
+
   const navigate = useNavigate();
   const [settings, setSettings] = useReaderSettings();
 
-  const sanitized = useMemo(() => sanitizeChapterHtml(chapter.contentHtml), [chapter.contentHtml]);
+  const chapterQ = useQuery({ ...chapterQuery(slug, num), enabled: validNumber });
+  const chapter = chapterQ.data ?? null;
 
-  const prevNum = chapter.number > 1 ? chapter.number - 1 : null;
-  const nextNum = chapter.number < chapter.totalChapters ? chapter.number + 1 : null;
+  const sanitized = useMemo(
+    () => (chapter ? sanitizeChapterHtml(chapter.contentHtml) : ""),
+    [chapter],
+  );
+
+  const prevNum = chapter && chapter.number > 1 ? chapter.number - 1 : null;
+  const nextNum = chapter && chapter.number < chapter.totalChapters ? chapter.number + 1 : null;
 
   const goTo = (n: number | null) => {
     if (n == null) return;
-    navigate({ to: "/truyen/$slug/chuong-$number", params: { slug, number: String(n) } });
+    navigate({ to: "/truyen/$slug/chuong-{$number}", params: { slug, number: String(n) } });
     window.scrollTo({ top: 0 });
   };
 
@@ -96,6 +103,45 @@ function ChapterReaderPage() {
     return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prevNum, nextNum, slug]);
+
+  if (!validNumber) return <NotFoundView />;
+
+  if (chapterQ.isPending) {
+    return (
+      <div className={`min-h-screen ${THEME_CLASS[settings.theme]}`}>
+        <main className="px-4 py-16">
+          <div className="mx-auto max-w-2xl space-y-4">
+            <div className="mx-auto h-8 w-2/3 animate-pulse rounded bg-muted/60" />
+            <div className="mx-auto h-5 w-1/2 animate-pulse rounded bg-muted/50" />
+            <div className="mt-8 space-y-3">
+              {Array.from({ length: 10 }, (_, i) => (
+                <div key={i} className="h-4 animate-pulse rounded bg-muted/40" />
+              ))}
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (chapterQ.isError) {
+    return (
+      <div className="container mx-auto px-4 py-20 text-center">
+        <h1 className="text-2xl font-bold">Không tải được chương</h1>
+        <p className="mt-2 text-muted-foreground">{(chapterQ.error as Error)?.message}</p>
+        <div className="mt-4 flex justify-center gap-3">
+          <Button variant="outline" onClick={() => chapterQ.refetch()}>
+            <RefreshCw className="mr-2 h-4 w-4" /> Thử lại
+          </Button>
+          <Button asChild variant="secondary">
+            <Link to="/truyen/$slug" params={{ slug }}>Về trang truyện</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!chapter) return <NotFoundView />;
 
   return (
     <div className={`min-h-screen transition-colors ${THEME_CLASS[settings.theme]}`}>
@@ -188,7 +234,8 @@ function NavRow({
 }
 
 function ChapterListSheet({ storySlug, currentNumber }: { storySlug: string; currentNumber: number }) {
-  const chapters = useMemo(() => getChaptersForStory(storySlug), [storySlug]);
+  const chaptersQ = useQuery(chaptersQuery(storySlug));
+  const chapters = chaptersQ.data ?? [];
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -201,19 +248,27 @@ function ChapterListSheet({ storySlug, currentNumber }: { storySlug: string; cur
           <SheetTitle>Danh sách chương</SheetTitle>
         </SheetHeader>
         <ScrollArea className="mt-4 h-[calc(100vh-6rem)] pr-3">
-          <ul className="space-y-1">
-            {chapters.map(c => (
-              <li key={c.number}>
-                <Link
-                  to="/truyen/$slug/chuong-$number"
-                  params={{ slug: storySlug, number: String(c.number) }}
-                  className={`block rounded px-3 py-2 text-sm hover:bg-accent ${c.number === currentNumber ? "bg-accent font-semibold" : ""}`}
-                >
-                  {c.title}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          {chaptersQ.isPending ? (
+            <div className="space-y-2">
+              {Array.from({ length: 12 }, (_, i) => (
+                <div key={i} className="h-9 animate-pulse rounded bg-muted/50" />
+              ))}
+            </div>
+          ) : (
+            <ul className="space-y-1">
+              {chapters.map(c => (
+                <li key={c.number}>
+                  <Link
+                    to="/truyen/$slug/chuong-{$number}"
+                    params={{ slug: storySlug, number: String(c.number) }}
+                    className={`block rounded px-3 py-2 text-sm hover:bg-accent ${c.number === currentNumber ? "bg-accent font-semibold" : ""}`}
+                  >
+                    {c.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
         </ScrollArea>
       </SheetContent>
     </Sheet>
@@ -303,6 +358,3 @@ function ReaderSettingsPopover({
     </Popover>
   );
 }
-
-// Silence unused import warning if BookOpen is not used elsewhere
-void BookOpen;
