@@ -10,12 +10,20 @@ export interface ApiErrorShape {
 export class ApiRequestError extends Error implements ApiErrorShape {
   statusCode: number;
   errors?: Record<string, string[]>;
+  /** true nếu request không tới được backend .NET (mạng lỗi, 5xx, hoặc nhận HTML thay vì JSON) */
+  backendUnreachable: boolean;
 
-  constructor(message: string, statusCode: number, errors?: Record<string, string[]>) {
+  constructor(
+    message: string,
+    statusCode: number,
+    errors?: Record<string, string[]>,
+    backendUnreachable = false,
+  ) {
     super(message);
     this.name = "ApiRequestError";
     this.statusCode = statusCode;
     this.errors = errors;
+    this.backendUnreachable = backendUnreachable;
   }
 }
 
@@ -114,14 +122,27 @@ export function toApiError(error: unknown): ApiRequestError {
   const e = error as AxiosError<{ message?: string; errors?: Record<string, string[]> }>;
   if (e && e.isAxiosError) {
     const statusCode = e.response?.status ?? 0;
-    const message = e.response?.data?.message || e.message || "Đã có lỗi xảy ra";
-    return new ApiRequestError(message, statusCode, e.response?.data?.errors);
+    const contentType = String(e.response?.headers?.["content-type"] ?? "");
+    // Nhận HTML thay vì JSON ⇒ request không tới được API .NET (rơi vào SSR/proxy lỗi)
+    const unreachable = !e.response || statusCode >= 500 || contentType.includes("text/html");
+    const message =
+      (typeof e.response?.data === "object" && e.response?.data?.message) ||
+      e.message ||
+      "Đã có lỗi xảy ra";
+    const errors =
+      typeof e.response?.data === "object" ? e.response?.data?.errors : undefined;
+    return new ApiRequestError(message, statusCode, errors, unreachable);
   }
-  return new ApiRequestError(error instanceof Error ? error.message : "Đã có lỗi xảy ra", 0);
+  return new ApiRequestError(
+    error instanceof Error ? error.message : "Đã có lỗi xảy ra",
+    0,
+    undefined,
+    true,
+  );
 }
 
 /** Lỗi mạng / backend không chạy / proxy lỗi → có thể fallback dữ liệu mẫu */
 export function isBackendUnavailable(error: unknown): boolean {
   const e = error instanceof ApiRequestError ? error : toApiError(error);
-  return e.statusCode === 0 || e.statusCode >= 500;
+  return e.backendUnreachable || e.statusCode === 0 || e.statusCode >= 500;
 }
