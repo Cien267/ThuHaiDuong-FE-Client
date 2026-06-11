@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { Flame, Sparkles, Trophy, Clock } from "lucide-react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { StoryCard, StoryCardCompact } from "@/features/stories/components/StoryCard";
-import { STORIES, CATEGORIES, filterStories } from "@/features/stories/mock-data";
+import { CATEGORIES } from "@/features/stories/mock-data";
+import { storiesQuery } from "@/features/stories/api";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
@@ -26,10 +28,16 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
-  const hot = filterStories({ sortBy: "TotalViews", sortDesc: true }).slice(0, 6);
-  const newest = filterStories({ sortBy: "LastChapterAt", sortDesc: true }).slice(0, 8);
-  const completed = filterStories({ storyType: "Completed" }).slice(0, 6);
-  const topRank = filterStories({ sortBy: "TotalViews", sortDesc: true }).slice(0, 10);
+  const hotQ = useQuery(storiesQuery({ sortBy: "TotalViews", sortDesc: true, page: 1, pageSize: 6 }));
+  const newestQ = useQuery(storiesQuery({ sortBy: "LastChapterAt", sortDesc: true, page: 1, pageSize: 8 }));
+  const completedQ = useQuery(storiesQuery({ storyType: "Completed", page: 1, pageSize: 6 }));
+  const topQ = useQuery(storiesQuery({ sortBy: "TotalViews", sortDesc: true, page: 1, pageSize: 10 }));
+  const serialQ = useQuery(storiesQuery({ storyType: "Serial", page: 1, pageSize: 1 }));
+
+  const hot = hotQ.data?.items ?? [];
+  const newest = newestQ.data?.items ?? [];
+  const completed = completedQ.data?.items ?? [];
+  const topRank = topQ.data?.items ?? [];
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -80,23 +88,35 @@ function HomePage() {
           <div className="space-y-10">
             {/* Hot */}
             <Section title="Truyện hot" icon={<Flame className="h-5 w-5 text-orange-500" />} href="/truyen" hrefSearch={{ sortBy: "TotalViews", sortDesc: true }}>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {hot.map(s => <StoryCard key={s.id} story={s} />)}
-              </div>
+              {hotQ.isPending ? (
+                <CardSkeletons count={6} />
+              ) : (
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {hot.map(s => <StoryCard key={s.id} story={s} />)}
+                </div>
+              )}
             </Section>
 
             {/* Newest */}
             <Section title="Mới cập nhật" icon={<Clock className="h-5 w-5 text-blue-500" />} href="/truyen" hrefSearch={{ sortBy: "LastChapterAt", sortDesc: true }}>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {newest.map(s => <StoryCard key={s.id} story={s} />)}
-              </div>
+              {newestQ.isPending ? (
+                <CardSkeletons count={8} />
+              ) : (
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {newest.map(s => <StoryCard key={s.id} story={s} />)}
+                </div>
+              )}
             </Section>
 
             {/* Completed */}
             <Section title="Truyện hoàn thành" icon={<Sparkles className="h-5 w-5 text-emerald-500" />} href="/truyen" hrefSearch={{ storyType: "Completed" }}>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {completed.map(s => <StoryCard key={s.id} story={s} />)}
-              </div>
+              {completedQ.isPending ? (
+                <CardSkeletons count={6} />
+              ) : (
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {completed.map(s => <StoryCard key={s.id} story={s} />)}
+                </div>
+              )}
             </Section>
           </div>
 
@@ -108,18 +128,26 @@ function HomePage() {
                 <h2 className="text-base font-bold">Top lượt đọc</h2>
               </div>
               <div className="p-2">
-                {topRank.map((s, i) => (
-                  <StoryCardCompact key={s.id} story={s} rank={i + 1} />
-                ))}
+                {topQ.isPending ? (
+                  <div className="space-y-2 p-2">
+                    {Array.from({ length: 10 }, (_, i) => (
+                      <div key={i} className="h-12 animate-pulse rounded-md bg-muted/60" />
+                    ))}
+                  </div>
+                ) : (
+                  topRank.map((s, i) => (
+                    <StoryCardCompact key={s.id} story={s} rank={i + 1} />
+                  ))
+                )}
               </div>
             </div>
 
             <div className="rounded-lg border border-border bg-card p-4">
               <h2 className="text-base font-bold">Thống kê</h2>
               <dl className="mt-3 space-y-2 text-sm">
-                <div className="flex justify-between"><dt className="text-muted-foreground">Tổng truyện</dt><dd className="font-medium">{STORIES.length.toLocaleString("vi-VN")}+</dd></div>
+                <div className="flex justify-between"><dt className="text-muted-foreground">Tổng truyện</dt><dd className="font-medium">{(topQ.data?.totalCount ?? 0).toLocaleString("vi-VN")}</dd></div>
                 <div className="flex justify-between"><dt className="text-muted-foreground">Thể loại</dt><dd className="font-medium">{CATEGORIES.length}</dd></div>
-                <div className="flex justify-between"><dt className="text-muted-foreground">Đang ra</dt><dd className="font-medium">{STORIES.filter(s => s.status === "Publishing").length}</dd></div>
+                <div className="flex justify-between"><dt className="text-muted-foreground">Đang ra</dt><dd className="font-medium">{(serialQ.data?.totalCount ?? 0).toLocaleString("vi-VN")}</dd></div>
               </dl>
             </div>
           </aside>
@@ -127,6 +155,16 @@ function HomePage() {
       </main>
 
       <SiteFooter />
+    </div>
+  );
+}
+
+function CardSkeletons({ count }: { count: number }) {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2">
+      {Array.from({ length: count }, (_, i) => (
+        <div key={i} className="h-44 animate-pulse rounded-lg border border-border bg-muted/50" />
+      ))}
     </div>
   );
 }
