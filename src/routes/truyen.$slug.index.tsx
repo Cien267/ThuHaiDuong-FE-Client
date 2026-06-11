@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BookOpen, Star, Eye, Bookmark, Clock, ListOrdered, Search, ChevronRight, RefreshCw } from "lucide-react";
 
-export const Route = createFileRoute("/truyen/$slug")({
+export const Route = createFileRoute("/truyen/$slug/")({
   head: ({ params }) => {
     const story = STORIES.find(s => s.slug === params.slug);
     const title = story ? `${story.title} — ${story.authorName}` : "Truyện";
