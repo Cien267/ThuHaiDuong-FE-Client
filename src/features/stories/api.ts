@@ -97,10 +97,12 @@ export async function fetchStory(slug: string): Promise<StorySummary | null> {
     const { data } = await api.get(`/stories/${slug}`);
     return data as StorySummary;
   } catch (err) {
+    if (isBackendUnavailable(err)) {
+      warnFallback();
+      return STORIES.find(s => s.slug === slug) ?? null;
+    }
     if (err instanceof ApiRequestError && err.statusCode === 404) return null;
-    if (!isBackendUnavailable(err)) throw err;
-    warnFallback();
-    return STORIES.find(s => s.slug === slug) ?? null;
+    throw err;
   }
 }
 
@@ -111,10 +113,12 @@ export async function fetchChapters(storySlug: string): Promise<ChapterSummary[]
     });
     return normalizePaged<ChapterSummary>(data, 1, 10_000).items;
   } catch (err) {
+    if (isBackendUnavailable(err)) {
+      warnFallback();
+      return getChaptersForStory(storySlug);
+    }
     if (err instanceof ApiRequestError && err.statusCode === 404) return [];
-    if (!isBackendUnavailable(err)) throw err;
-    warnFallback();
-    return getChaptersForStory(storySlug);
+    throw err;
   }
 }
 
@@ -123,10 +127,12 @@ export async function fetchChapter(storySlug: string, number: number): Promise<C
     const { data } = await api.get(`/stories/${storySlug}/chapters/${number}`);
     return data as ChapterDetail;
   } catch (err) {
+    if (isBackendUnavailable(err)) {
+      warnFallback();
+      return getChapter(storySlug, number);
+    }
     if (err instanceof ApiRequestError && err.statusCode === 404) return null;
-    if (!isBackendUnavailable(err)) throw err;
-    warnFallback();
-    return getChapter(storySlug, number);
+    throw err;
   }
 }
 
