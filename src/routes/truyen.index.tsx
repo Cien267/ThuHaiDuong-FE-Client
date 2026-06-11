@@ -23,7 +23,7 @@ const searchSchema = z.object({
 
 const PAGE_SIZE = 12;
 
-export const Route = createFileRoute("/truyen")({
+export const Route = createFileRoute("/truyen/")({
   validateSearch: zodValidator(searchSchema),
   head: () => ({
     meta: [
