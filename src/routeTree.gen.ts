@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as DangNhapRouteImport } from './routes/dang-nhap'
+import { Route as DangKyRouteImport } from './routes/dang-ky'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TruyenIndexRouteImport } from './routes/truyen.index'
 import { Route as TruyenSlugIndexRouteImport } from './routes/truyen.$slug.index'
@@ -18,6 +19,11 @@ import { Route as TruyenSlugChuongChar123numberChar125RouteImport } from './rout
 const DangNhapRoute = DangNhapRouteImport.update({
   id: '/dang-nhap',
   path: '/dang-nhap',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DangKyRoute = DangKyRouteImport.update({
+  id: '/dang-ky',
+  path: '/dang-ky',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -44,6 +50,7 @@ const TruyenSlugChuongChar123numberChar125Route =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dang-ky': typeof DangKyRoute
   '/dang-nhap': typeof DangNhapRoute
   '/truyen/': typeof TruyenIndexRoute
   '/truyen/$slug/chuong-{$number}': typeof TruyenSlugChuongChar123numberChar125Route
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dang-ky': typeof DangKyRoute
   '/dang-nhap': typeof DangNhapRoute
   '/truyen': typeof TruyenIndexRoute
   '/truyen/$slug/chuong-{$number}': typeof TruyenSlugChuongChar123numberChar125Route
@@ -59,6 +67,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/dang-ky': typeof DangKyRoute
   '/dang-nhap': typeof DangNhapRoute
   '/truyen/': typeof TruyenIndexRoute
   '/truyen/$slug/chuong-{$number}': typeof TruyenSlugChuongChar123numberChar125Route
@@ -68,6 +77,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/dang-ky'
     | '/dang-nhap'
     | '/truyen/'
     | '/truyen/$slug/chuong-{$number}'
@@ -75,6 +85,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/dang-ky'
     | '/dang-nhap'
     | '/truyen'
     | '/truyen/$slug/chuong-{$number}'
@@ -82,6 +93,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/dang-ky'
     | '/dang-nhap'
     | '/truyen/'
     | '/truyen/$slug/chuong-{$number}'
@@ -90,6 +102,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DangKyRoute: typeof DangKyRoute
   DangNhapRoute: typeof DangNhapRoute
   TruyenIndexRoute: typeof TruyenIndexRoute
   TruyenSlugChuongChar123numberChar125Route: typeof TruyenSlugChuongChar123numberChar125Route
@@ -103,6 +116,13 @@ declare module '@tanstack/react-router' {
       path: '/dang-nhap'
       fullPath: '/dang-nhap'
       preLoaderRoute: typeof DangNhapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dang-ky': {
+      id: '/dang-ky'
+      path: '/dang-ky'
+      fullPath: '/dang-ky'
+      preLoaderRoute: typeof DangKyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -138,6 +158,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DangKyRoute: DangKyRoute,
   DangNhapRoute: DangNhapRoute,
   TruyenIndexRoute: TruyenIndexRoute,
   TruyenSlugChuongChar123numberChar125Route:
@@ -147,13 +168,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
