@@ -1,14 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { toast } from "sonner";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { STORIES, STATUS_LABEL, COUNTRY_LABEL, formatViews } from "@/features/stories/mock-data";
 import { storyQuery, chaptersQuery } from "@/features/stories/api";
+import { addBookmark, bookmarkStatusQuery, removeBookmark } from "@/features/library/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { BookOpen, Star, Eye, Bookmark, Clock, ListOrdered, Search, ChevronRight, RefreshCw } from "lucide-react";
+import { BookOpen, Star, Eye, Bookmark, BookmarkCheck, Clock, ListOrdered, Search, ChevronRight, RefreshCw } from "lucide-react";
 
 export const Route = createFileRoute("/truyen/$slug/")({
   head: ({ params }) => {
@@ -156,7 +158,14 @@ function StoryDetailPage() {
                       </Link>
                     </Button>
                   )}
-                  <Button variant="outline"><Bookmark className="mr-2 h-4 w-4" /> Đánh dấu</Button>
+                  <BookmarkButton slug={story.slug} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* (unchanged below) */}
                 </div>
               </div>
             </div>
