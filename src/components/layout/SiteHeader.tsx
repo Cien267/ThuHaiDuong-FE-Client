@@ -1,12 +1,33 @@
-import { Link } from "@tanstack/react-router";
-import { Search, BookMarked, User, Menu } from "lucide-react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Search, BookMarked, User, Menu, LogOut, Library } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { CATEGORIES } from "@/features/stories/mock-data";
+import { useAuthStore } from "@/features/auth/store";
+import { toast } from "sonner";
 
 export function SiteHeader() {
   const [q, setQ] = useState("");
+  const navigate = useNavigate();
+  const user = useAuthStore(s => s.user);
+  const status = useAuthStore(s => s.status);
+  const logout = useAuthStore(s => s.logout);
+
+  async function handleLogout() {
+    await logout();
+    toast.success("Đã đăng xuất");
+    navigate({ to: "/" });
+  }
+
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur">
       <div className="container mx-auto flex h-16 items-center gap-4 px-4">
@@ -70,12 +91,52 @@ export function SiteHeader() {
         </form>
 
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex">
-            <Link to="/dang-nhap">
-              <User className="mr-1 h-4 w-4" />
-              Đăng nhập
-            </Link>
-          </Button>
+          {status === "authenticated" && user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold text-primary">
+                    {(user.displayName || user.username || user.email)
+                      .slice(0, 1)
+                      .toUpperCase()}
+                  </span>
+                  <span className="hidden max-w-[120px] truncate sm:inline">
+                    {user.displayName || user.username}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel className="truncate">
+                  {user.displayName || user.username}
+                  <div className="truncate text-xs font-normal text-muted-foreground">
+                    {user.email}
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem disabled>
+                  <Library className="mr-2 h-4 w-4" />
+                  Tủ sách (sắp ra mắt)
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Đăng xuất
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <>
+              <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex">
+                <Link to="/dang-nhap">
+                  <User className="mr-1 h-4 w-4" />
+                  Đăng nhập
+                </Link>
+              </Button>
+              <Button size="sm" asChild className="hidden sm:inline-flex">
+                <Link to="/dang-ky">Đăng ký</Link>
+              </Button>
+            </>
+          )}
           <Button variant="ghost" size="icon" className="md:hidden">
             <Menu className="h-5 w-5" />
           </Button>
