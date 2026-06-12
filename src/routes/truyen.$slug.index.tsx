@@ -165,12 +165,6 @@ function StoryDetailPage() {
           </div>
         </section>
 
-        {/* (unchanged below) */}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* Description */}
         <section className="container mx-auto px-4 py-8">
