@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TuSachRouteImport } from './routes/tu-sach'
 import { Route as DangNhapRouteImport } from './routes/dang-nhap'
 import { Route as DangKyRouteImport } from './routes/dang-ky'
 import { Route as IndexRouteImport } from './routes/index'
@@ -16,6 +17,11 @@ import { Route as TruyenIndexRouteImport } from './routes/truyen.index'
 import { Route as TruyenSlugIndexRouteImport } from './routes/truyen.$slug.index'
 import { Route as TruyenSlugChuongChar123numberChar125RouteImport } from './routes/truyen.$slug.chuong-{$number}'
 
+const TuSachRoute = TuSachRouteImport.update({
+  id: '/tu-sach',
+  path: '/tu-sach',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DangNhapRoute = DangNhapRouteImport.update({
   id: '/dang-nhap',
   path: '/dang-nhap',
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dang-ky': typeof DangKyRoute
   '/dang-nhap': typeof DangNhapRoute
+  '/tu-sach': typeof TuSachRoute
   '/truyen/': typeof TruyenIndexRoute
   '/truyen/$slug/chuong-{$number}': typeof TruyenSlugChuongChar123numberChar125Route
   '/truyen/$slug/': typeof TruyenSlugIndexRoute
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dang-ky': typeof DangKyRoute
   '/dang-nhap': typeof DangNhapRoute
+  '/tu-sach': typeof TuSachRoute
   '/truyen': typeof TruyenIndexRoute
   '/truyen/$slug/chuong-{$number}': typeof TruyenSlugChuongChar123numberChar125Route
   '/truyen/$slug': typeof TruyenSlugIndexRoute
@@ -69,6 +77,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/dang-ky': typeof DangKyRoute
   '/dang-nhap': typeof DangNhapRoute
+  '/tu-sach': typeof TuSachRoute
   '/truyen/': typeof TruyenIndexRoute
   '/truyen/$slug/chuong-{$number}': typeof TruyenSlugChuongChar123numberChar125Route
   '/truyen/$slug/': typeof TruyenSlugIndexRoute
@@ -79,6 +88,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dang-ky'
     | '/dang-nhap'
+    | '/tu-sach'
     | '/truyen/'
     | '/truyen/$slug/chuong-{$number}'
     | '/truyen/$slug/'
@@ -87,6 +97,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dang-ky'
     | '/dang-nhap'
+    | '/tu-sach'
     | '/truyen'
     | '/truyen/$slug/chuong-{$number}'
     | '/truyen/$slug'
@@ -95,6 +106,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dang-ky'
     | '/dang-nhap'
+    | '/tu-sach'
     | '/truyen/'
     | '/truyen/$slug/chuong-{$number}'
     | '/truyen/$slug/'
@@ -104,6 +116,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DangKyRoute: typeof DangKyRoute
   DangNhapRoute: typeof DangNhapRoute
+  TuSachRoute: typeof TuSachRoute
   TruyenIndexRoute: typeof TruyenIndexRoute
   TruyenSlugChuongChar123numberChar125Route: typeof TruyenSlugChuongChar123numberChar125Route
   TruyenSlugIndexRoute: typeof TruyenSlugIndexRoute
@@ -111,6 +124,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/tu-sach': {
+      id: '/tu-sach'
+      path: '/tu-sach'
+      fullPath: '/tu-sach'
+      preLoaderRoute: typeof TuSachRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dang-nhap': {
       id: '/dang-nhap'
       path: '/dang-nhap'
@@ -160,6 +180,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DangKyRoute: DangKyRoute,
   DangNhapRoute: DangNhapRoute,
+  TuSachRoute: TuSachRoute,
   TruyenIndexRoute: TruyenIndexRoute,
   TruyenSlugChuongChar123numberChar125Route:
     TruyenSlugChuongChar123numberChar125Route,
@@ -168,3 +189,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
