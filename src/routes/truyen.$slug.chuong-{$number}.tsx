@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 import { getChapter } from "@/features/stories/chapters";
 import { chapterQuery, chaptersQuery } from "@/features/stories/api";
+import { updateProgress } from "@/features/library/api";
 import { sanitizeChapterHtml } from "@/features/reader/sanitize";
 import {
   useReaderSettings,
@@ -81,6 +82,11 @@ function ChapterReaderPage() {
     () => (chapter ? sanitizeChapterHtml(chapter.contentHtml) : ""),
     [chapter],
   );
+
+  // Ghi nhận tiến độ đọc (forward-only, best-effort)
+  useEffect(() => {
+    if (chapter) void updateProgress(slug, chapter.number, chapter.title);
+  }, [slug, chapter]);
 
   const prevNum = chapter && chapter.number > 1 ? chapter.number - 1 : null;
   const nextNum = chapter && chapter.number < chapter.totalChapters ? chapter.number + 1 : null;

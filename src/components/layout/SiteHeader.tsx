@@ -113,9 +113,11 @@ export function SiteHeader() {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem disabled>
-                  <Library className="mr-2 h-4 w-4" />
-                  Tủ sách (sắp ra mắt)
+                <DropdownMenuItem asChild>
+                  <Link to="/tu-sach">
+                    <Library className="mr-2 h-4 w-4" />
+                    Tủ sách
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
