@@ -247,3 +247,27 @@ function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; va
     </div>
   );
 }
+
+function BookmarkButton({ slug }: { slug: string }) {
+  const qc = useQueryClient();
+  const { data: marked } = useQuery(bookmarkStatusQuery(slug));
+  const mut = useMutation({
+    mutationFn: () => (marked ? removeBookmark(slug) : addBookmark(slug)),
+    onSuccess: () => {
+      toast.success(marked ? "Đã xoá khỏi tủ sách" : "Đã thêm vào tủ sách");
+      qc.invalidateQueries({ queryKey: ["bookmark", slug] });
+      qc.invalidateQueries({ queryKey: ["bookmarks"] });
+    },
+    onError: (e: Error) => toast.error(e.message || "Thao tác thất bại"),
+  });
+  return (
+    <Button variant={marked ? "secondary" : "outline"} onClick={() => mut.mutate()} disabled={mut.isPending}>
+      {marked ? (
+        <><BookmarkCheck className="mr-2 h-4 w-4" /> Đã đánh dấu</>
+      ) : (
+        <><Bookmark className="mr-2 h-4 w-4" /> Đánh dấu</>
+      )}
+    </Button>
+  );
+}
+}
