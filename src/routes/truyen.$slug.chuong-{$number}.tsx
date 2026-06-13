@@ -78,6 +78,9 @@ function ChapterReaderPage() {
 
   const chapterQ = useQuery({ ...chapterQuery(slug, num), enabled: validNumber });
   const chapter = chapterQ.data ?? null;
+  const storyQ = useQuery(storyQuery(slug));
+  const storyId = storyQ.data?.id ?? null;
+  const chapterId = chapter?.id ?? null;
 
   const sanitized = useMemo(
     () => (chapter ? sanitizeChapterHtml(chapter.contentHtml) : ""),
