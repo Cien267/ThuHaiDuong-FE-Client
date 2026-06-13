@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 import { getChapter } from "@/features/stories/chapters";
-import { chapterQuery, chaptersQuery } from "@/features/stories/api";
+import { chapterQuery, chaptersQuery, storyQuery } from "@/features/stories/api";
 import { updateProgress } from "@/features/library/api";
 import { sanitizeChapterHtml } from "@/features/reader/sanitize";
 import {
@@ -42,6 +42,7 @@ import {
   ArrowUp,
   RefreshCw,
 } from "lucide-react";
+import { GlobalAffiliate, InChapterAffiliate, PopupAffiliate } from "@/features/affiliate/components";
 
 export const Route = createFileRoute("/truyen/$slug/chuong-{$number}")({
   head: ({ params }) => {
@@ -77,6 +78,9 @@ function ChapterReaderPage() {
 
   const chapterQ = useQuery({ ...chapterQuery(slug, num), enabled: validNumber });
   const chapter = chapterQ.data ?? null;
+  const storyQ = useQuery(storyQuery(slug));
+  const storyId = storyQ.data?.id ?? null;
+  const chapterId = chapter?.id ?? null;
 
   const sanitized = useMemo(
     () => (chapter ? sanitizeChapterHtml(chapter.contentHtml) : ""),
@@ -173,6 +177,8 @@ function ChapterReaderPage() {
         </div>
       </header>
 
+      <GlobalAffiliate storyId={storyId} chapterId={chapterId} />
+
       {/* Content */}
       <main className="px-4 py-8">
         <article
@@ -194,6 +200,9 @@ function ChapterReaderPage() {
             dangerouslySetInnerHTML={{ __html: sanitized }}
           />
 
+          {/* Affiliate sau nội dung chương, TRƯỚC điều hướng prev/next */}
+          <InChapterAffiliate storyId={storyId} chapterId={chapterId} />
+
           <div className="mt-10">
             <NavRow prev={prevNum} next={nextNum} totalChapters={chapter.totalChapters} current={chapter.number} onGo={goTo} />
           </div>
@@ -213,6 +222,8 @@ function ChapterReaderPage() {
       >
         <ArrowUp className="h-4 w-4" />
       </Button>
+
+      <PopupAffiliate storyId={storyId} chapterId={chapterId} />
     </div>
   );
 }

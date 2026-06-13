@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BookOpen, Star, Eye, Bookmark, BookmarkCheck, Clock, ListOrdered, Search, ChevronRight, RefreshCw } from "lucide-react";
+import { GlobalAffiliate, PopupAffiliate, SidebarAffiliate } from "@/features/affiliate/components";
 
 export const Route = createFileRoute("/truyen/$slug/")({
   head: ({ params }) => {
@@ -108,6 +109,7 @@ function StoryDetailPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <SiteHeader />
+      <GlobalAffiliate storyId={story.id} />
       <main className="flex-1">
         {/* Header section */}
         <section className="border-b border-border bg-gradient-to-br from-primary/5 via-background to-accent/20">
@@ -166,10 +168,13 @@ function StoryDetailPage() {
         </section>
 
 
-        {/* Description */}
-        <section className="container mx-auto px-4 py-8">
-          <h2 className="mb-3 text-lg font-semibold">Giới thiệu</h2>
-          <p className="whitespace-pre-line leading-relaxed text-foreground/90">{story.description}</p>
+        {/* Description + sidebar (sidebar chỉ hiển thị trên md+) */}
+        <section className="container mx-auto grid gap-8 px-4 py-8 md:grid-cols-[1fr_280px]">
+          <div>
+            <h2 className="mb-3 text-lg font-semibold">Giới thiệu</h2>
+            <p className="whitespace-pre-line leading-relaxed text-foreground/90">{story.description}</p>
+          </div>
+          <SidebarAffiliate storyId={story.id} />
         </section>
 
         {/* Chapter list */}
@@ -235,6 +240,7 @@ function StoryDetailPage() {
         </section>
       </main>
       <SiteFooter />
+      <PopupAffiliate storyId={story.id} />
     </div>
   );
 }
