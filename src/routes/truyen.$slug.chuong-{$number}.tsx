@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 import { getChapter } from "@/features/stories/chapters";
-import { chapterQuery, chaptersQuery } from "@/features/stories/api";
+import { chapterQuery, chaptersQuery, storyQuery } from "@/features/stories/api";
 import { updateProgress } from "@/features/library/api";
 import { sanitizeChapterHtml } from "@/features/reader/sanitize";
 import {
