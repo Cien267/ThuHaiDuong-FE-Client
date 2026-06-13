@@ -168,10 +168,13 @@ function StoryDetailPage() {
         </section>
 
 
-        {/* Description */}
-        <section className="container mx-auto px-4 py-8">
-          <h2 className="mb-3 text-lg font-semibold">Giới thiệu</h2>
-          <p className="whitespace-pre-line leading-relaxed text-foreground/90">{story.description}</p>
+        {/* Description + sidebar (sidebar chỉ hiển thị trên md+) */}
+        <section className="container mx-auto grid gap-8 px-4 py-8 md:grid-cols-[1fr_280px]">
+          <div>
+            <h2 className="mb-3 text-lg font-semibold">Giới thiệu</h2>
+            <p className="whitespace-pre-line leading-relaxed text-foreground/90">{story.description}</p>
+          </div>
+          <SidebarAffiliate storyId={story.id} />
         </section>
 
         {/* Chapter list */}
