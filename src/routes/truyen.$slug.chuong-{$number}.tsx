@@ -222,6 +222,8 @@ function ChapterReaderPage() {
       >
         <ArrowUp className="h-4 w-4" />
       </Button>
+
+      <PopupAffiliate storyId={storyId} chapterId={chapterId} />
     </div>
   );
 }
