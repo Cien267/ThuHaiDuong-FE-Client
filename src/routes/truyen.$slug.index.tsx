@@ -109,6 +109,7 @@ function StoryDetailPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <SiteHeader />
+      <GlobalAffiliate storyId={story.id} />
       <main className="flex-1">
         {/* Header section */}
         <section className="border-b border-border bg-gradient-to-br from-primary/5 via-background to-accent/20">
