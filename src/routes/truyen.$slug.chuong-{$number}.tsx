@@ -228,12 +228,14 @@ function NavRow({
 }) {
   return (
     <div className="flex items-center justify-between gap-2">
-      <Button variant="outline" disabled={prev == null} onClick={() => onGo(prev)}>
-        <ChevronLeft className="mr-1 h-4 w-4" /> Chương trước
+      <Button variant="outline" size="sm" disabled={prev == null} onClick={() => onGo(prev)} className="px-2 sm:px-4">
+        <ChevronLeft className="h-4 w-4 sm:mr-1" />
+        <span className="hidden sm:inline">Chương trước</span>
       </Button>
       <span className="text-xs opacity-70">{current} / {totalChapters}</span>
-      <Button variant="outline" disabled={next == null} onClick={() => onGo(next)}>
-        Chương sau <ChevronRight className="ml-1 h-4 w-4" />
+      <Button variant="outline" size="sm" disabled={next == null} onClick={() => onGo(next)} className="px-2 sm:px-4">
+        <span className="hidden sm:inline">Chương sau</span>
+        <ChevronRight className="h-4 w-4 sm:ml-1" />
       </Button>
     </div>
   );
