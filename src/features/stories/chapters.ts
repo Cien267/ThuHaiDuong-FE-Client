@@ -1,6 +1,7 @@
 import { STORIES } from "./mock-data";
 
 export interface ChapterSummary {
+  id?: string;
   number: number;
   title: string;
   publishedAt: string;
