@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BookOpen, Star, Eye, Bookmark, BookmarkCheck, Clock, ListOrdered, Search, ChevronRight, RefreshCw } from "lucide-react";
+import { GlobalAffiliate, PopupAffiliate, SidebarAffiliate } from "@/features/affiliate/components";
 
 export const Route = createFileRoute("/truyen/$slug/")({
   head: ({ params }) => {
