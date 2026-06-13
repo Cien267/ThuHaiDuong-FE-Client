@@ -42,6 +42,7 @@ import {
   ArrowUp,
   RefreshCw,
 } from "lucide-react";
+import { GlobalAffiliate, InChapterAffiliate, PopupAffiliate } from "@/features/affiliate/components";
 
 export const Route = createFileRoute("/truyen/$slug/chuong-{$number}")({
   head: ({ params }) => {
