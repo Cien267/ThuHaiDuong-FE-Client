@@ -240,6 +240,7 @@ function StoryDetailPage() {
         </section>
       </main>
       <SiteFooter />
+      <PopupAffiliate storyId={story.id} />
     </div>
   );
 }
