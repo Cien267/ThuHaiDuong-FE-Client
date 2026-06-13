@@ -200,6 +200,9 @@ function ChapterReaderPage() {
             dangerouslySetInnerHTML={{ __html: sanitized }}
           />
 
+          {/* Affiliate sau nội dung chương, TRƯỚC điều hướng prev/next */}
+          <InChapterAffiliate storyId={storyId} chapterId={chapterId} />
+
           <div className="mt-10">
             <NavRow prev={prevNum} next={nextNum} totalChapters={chapter.totalChapters} current={chapter.number} onGo={goTo} />
           </div>
