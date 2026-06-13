@@ -177,6 +177,8 @@ function ChapterReaderPage() {
         </div>
       </header>
 
+      <GlobalAffiliate storyId={storyId} chapterId={chapterId} />
+
       {/* Content */}
       <main className="px-4 py-8">
         <article
