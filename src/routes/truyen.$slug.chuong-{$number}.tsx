@@ -13,11 +13,7 @@ import {
 } from "@/features/reader/reader-settings";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -25,24 +21,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { ChevronLeft, ChevronRight, Settings2, List, Home, ArrowUp, RefreshCw } from "lucide-react";
 import {
-  ChevronLeft,
-  ChevronRight,
-  Settings2,
-  List,
-  Home,
-  ArrowUp,
-  RefreshCw,
-} from "lucide-react";
-import { GlobalAffiliate, InChapterAffiliate, PopupAffiliate } from "@/features/affiliate/components";
+  GlobalAffiliate,
+  InChapterAffiliate,
+  PopupAffiliate,
+} from "@/features/affiliate/components";
 
 export const Route = createFileRoute("/truyen/$slug/chuong-{$number}")({
   head: ({ params }) => {
@@ -50,8 +36,13 @@ export const Route = createFileRoute("/truyen/$slug/chuong-{$number}")({
     const title = ch ? `${ch.title} - ${ch.storyTitle}` : "Đọc chương";
     return {
       meta: [
-        { title: `${title} | Truyện Việt` },
-        { name: "description", content: ch ? `${ch.storyTitle} — ${ch.title}. Đọc online miễn phí.` : "Đọc truyện online." },
+        { title: `${title} | Thu Hải Đường` },
+        {
+          name: "description",
+          content: ch
+            ? `${ch.storyTitle} — ${ch.title}. Đọc online miễn phí.`
+            : "Đọc truyện online.",
+        },
       ],
     };
   },
@@ -63,7 +54,9 @@ function NotFoundView() {
   return (
     <div className="container mx-auto px-4 py-20 text-center">
       <h1 className="text-2xl font-bold">Không tìm thấy chương</h1>
-      <Link to="/" className="text-primary underline">← Về trang chủ</Link>
+      <Link to="/" className="text-primary underline">
+        ← Về trang chủ
+      </Link>
     </div>
   );
 }
@@ -105,9 +98,18 @@ function ChapterReaderPage() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
-      if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) return;
-      if (e.key === "ArrowLeft") { e.preventDefault(); goTo(prevNum); }
-      else if (e.key === "ArrowRight") { e.preventDefault(); goTo(nextNum); }
+      if (
+        target &&
+        (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)
+      )
+        return;
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        goTo(prevNum);
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        goTo(nextNum);
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -144,7 +146,9 @@ function ChapterReaderPage() {
             <RefreshCw className="mr-2 h-4 w-4" /> Thử lại
           </Button>
           <Button asChild variant="secondary">
-            <Link to="/truyen/$slug" params={{ slug }}>Về trang truyện</Link>
+            <Link to="/truyen/$slug" params={{ slug }}>
+              Về trang truyện
+            </Link>
           </Button>
         </div>
       </div>
@@ -160,7 +164,9 @@ function ChapterReaderPage() {
         <div className="container mx-auto flex items-center justify-between gap-3 px-4 py-3">
           <div className="flex items-center gap-2 min-w-0">
             <Button asChild variant="ghost" size="icon" aria-label="Trang chủ">
-              <Link to="/"><Home className="h-4 w-4" /></Link>
+              <Link to="/">
+                <Home className="h-4 w-4" />
+              </Link>
             </Button>
             <Link
               to="/truyen/$slug"
@@ -188,7 +194,13 @@ function ChapterReaderPage() {
           <h1 className="mb-2 text-center text-2xl font-bold">{chapter.storyTitle}</h1>
           <h2 className="mb-8 text-center text-lg font-semibold opacity-80">{chapter.title}</h2>
 
-          <NavRow prev={prevNum} next={nextNum} totalChapters={chapter.totalChapters} current={chapter.number} onGo={goTo} />
+          <NavRow
+            prev={prevNum}
+            next={nextNum}
+            totalChapters={chapter.totalChapters}
+            current={chapter.number}
+            onGo={goTo}
+          />
 
           <div
             className="reader-content mt-8 space-y-5"
@@ -204,7 +216,13 @@ function ChapterReaderPage() {
           <InChapterAffiliate storyId={storyId} chapterId={chapterId} />
 
           <div className="mt-10">
-            <NavRow prev={prevNum} next={nextNum} totalChapters={chapter.totalChapters} current={chapter.number} onGo={goTo} />
+            <NavRow
+              prev={prevNum}
+              next={nextNum}
+              totalChapters={chapter.totalChapters}
+              current={chapter.number}
+              onGo={goTo}
+            />
           </div>
 
           <p className="mt-6 text-center text-xs opacity-60">
@@ -229,7 +247,11 @@ function ChapterReaderPage() {
 }
 
 function NavRow({
-  prev, next, current, totalChapters, onGo,
+  prev,
+  next,
+  current,
+  totalChapters,
+  onGo,
 }: {
   prev: number | null;
   next: number | null;
@@ -239,12 +261,26 @@ function NavRow({
 }) {
   return (
     <div className="flex items-center justify-between gap-2">
-      <Button variant="outline" size="sm" disabled={prev == null} onClick={() => onGo(prev)} className="px-2 sm:px-4">
+      <Button
+        variant="outline"
+        size="sm"
+        disabled={prev == null}
+        onClick={() => onGo(prev)}
+        className="px-2 sm:px-4"
+      >
         <ChevronLeft className="h-4 w-4 sm:mr-1" />
         <span className="hidden sm:inline">Chương trước</span>
       </Button>
-      <span className="text-xs opacity-70">{current} / {totalChapters}</span>
-      <Button variant="outline" size="sm" disabled={next == null} onClick={() => onGo(next)} className="px-2 sm:px-4">
+      <span className="text-xs opacity-70">
+        {current} / {totalChapters}
+      </span>
+      <Button
+        variant="outline"
+        size="sm"
+        disabled={next == null}
+        onClick={() => onGo(next)}
+        className="px-2 sm:px-4"
+      >
         <span className="hidden sm:inline">Chương sau</span>
         <ChevronRight className="h-4 w-4 sm:ml-1" />
       </Button>
@@ -252,7 +288,13 @@ function NavRow({
   );
 }
 
-function ChapterListSheet({ storySlug, currentNumber }: { storySlug: string; currentNumber: number }) {
+function ChapterListSheet({
+  storySlug,
+  currentNumber,
+}: {
+  storySlug: string;
+  currentNumber: number;
+}) {
   const chaptersQ = useQuery(chaptersQuery(storySlug));
   const chapters = chaptersQ.data ?? [];
   return (
@@ -275,7 +317,7 @@ function ChapterListSheet({ storySlug, currentNumber }: { storySlug: string; cur
             </div>
           ) : (
             <ul className="space-y-1">
-              {chapters.map(c => (
+              {chapters.map((c) => (
                 <li key={c.number}>
                   <Link
                     to="/truyen/$slug/chuong-{$number}"
@@ -295,7 +337,8 @@ function ChapterListSheet({ storySlug, currentNumber }: { storySlug: string; cur
 }
 
 function ReaderSettingsPopover({
-  settings, setSettings,
+  settings,
+  setSettings,
 }: {
   settings: ReaderSettings;
   setSettings: (s: ReaderSettings) => void;
@@ -318,7 +361,9 @@ function ReaderSettingsPopover({
               <span className="text-muted-foreground">{settings.fontSize}px</span>
             </div>
             <Slider
-              min={14} max={28} step={1}
+              min={14}
+              max={28}
+              step={1}
               value={[settings.fontSize]}
               onValueChange={([v]) => update("fontSize", v)}
             />
@@ -329,7 +374,9 @@ function ReaderSettingsPopover({
               <span className="text-muted-foreground">{settings.lineHeight.toFixed(1)}</span>
             </div>
             <Slider
-              min={14} max={24} step={1}
+              min={14}
+              max={24}
+              step={1}
               value={[Math.round(settings.lineHeight * 10)]}
               onValueChange={([v]) => update("lineHeight", v / 10)}
             />
@@ -340,15 +387,22 @@ function ReaderSettingsPopover({
               <span className="text-muted-foreground">{settings.maxWidth}px</span>
             </div>
             <Slider
-              min={560} max={1040} step={20}
+              min={560}
+              max={1040}
+              step={20}
               value={[settings.maxWidth]}
               onValueChange={([v]) => update("maxWidth", v)}
             />
           </div>
           <div>
             <label className="mb-2 block text-sm">Phông chữ</label>
-            <Select value={settings.fontFamily} onValueChange={(v) => update("fontFamily", v as ReaderSettings["fontFamily"])}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+            <Select
+              value={settings.fontFamily}
+              onValueChange={(v) => update("fontFamily", v as ReaderSettings["fontFamily"])}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="serif">Serif (mặc định)</SelectItem>
                 <SelectItem value="sans">Sans-serif</SelectItem>
@@ -359,12 +413,16 @@ function ReaderSettingsPopover({
           <div>
             <label className="mb-2 block text-sm">Nền</label>
             <div className="grid grid-cols-3 gap-2">
-              {(["light", "sepia", "dark"] as const).map(t => (
+              {(["light", "sepia", "dark"] as const).map((t) => (
                 <button
                   key={t}
                   onClick={() => update("theme", t)}
                   className={`rounded-md border px-2 py-2 text-xs capitalize ${settings.theme === t ? "border-primary ring-1 ring-primary" : "border-border"} ${
-                    t === "light" ? "bg-white text-black" : t === "sepia" ? "bg-[#f4ecd8] text-[#3a2f1c]" : "bg-[#1a1a1a] text-[#d4d4d4]"
+                    t === "light"
+                      ? "bg-white text-black"
+                      : t === "sepia"
+                        ? "bg-[#f4ecd8] text-[#3a2f1c]"
+                        : "bg-[#1a1a1a] text-[#d4d4d4]"
                   }`}
                 >
                   {t === "light" ? "Sáng" : t === "sepia" ? "Sepia" : "Tối"}

@@ -18,10 +18,7 @@ export const Route = createFileRoute("/dang-nhap")({
     redirect: typeof s.redirect === "string" ? s.redirect : undefined,
   }),
   head: () => ({
-    meta: [
-      { title: "Đăng nhập — Truyện Việt" },
-      { name: "robots", content: "noindex,follow" },
-    ],
+    meta: [{ title: "Đăng nhập — Thu Hải Đường" }, { name: "robots", content: "noindex,follow" }],
   }),
   component: LoginPage,
 });
@@ -30,9 +27,9 @@ function LoginPage() {
   const navigate = useNavigate();
   const router = useRouter();
   const { redirect } = Route.useSearch();
-  const status = useAuthStore(s => s.status);
-  const login = useAuthStore(s => s.login);
-  const clearError = useAuthStore(s => s.clearError);
+  const status = useAuthStore((s) => s.status);
+  const login = useAuthStore((s) => s.login);
+  const clearError = useAuthStore((s) => s.clearError);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -81,8 +78,8 @@ function LoginPage() {
         <div className="w-full max-w-sm rounded-lg border border-border bg-card p-6 shadow-sm">
           <h1 className="text-2xl font-bold">Đăng nhập</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Chào mừng bạn quay trở lại. Đọc truyện không cần đăng nhập — đăng nhập để
-            đồng bộ tủ sách & lịch sử đọc.
+            Chào mừng bạn quay trở lại. Đọc truyện không cần đăng nhập — đăng nhập để đồng bộ tủ
+            sách & lịch sử đọc.
           </p>
           <form className="mt-6 space-y-4" onSubmit={onSubmit} noValidate>
             <div>
@@ -90,7 +87,7 @@ function LoginPage() {
               <Input
                 type="email"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 autoComplete="email"
                 disabled={submitting}
@@ -102,12 +99,14 @@ function LoginPage() {
               <Input
                 type="password"
                 value={password}
-                onChange={e => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 autoComplete="current-password"
                 disabled={submitting}
               />
-              {errors.password && <p className="mt-1 text-xs text-destructive">{errors.password}</p>}
+              {errors.password && (
+                <p className="mt-1 text-xs text-destructive">{errors.password}</p>
+              )}
             </div>
             {errors.form && (
               <p className="rounded bg-destructive/10 px-3 py-2 text-xs text-destructive">

@@ -10,17 +10,28 @@ import { addBookmark, bookmarkStatusQuery, removeBookmark } from "@/features/lib
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { BookOpen, Star, Eye, Bookmark, BookmarkCheck, Clock, ListOrdered, Search, ChevronRight, RefreshCw } from "lucide-react";
+import {
+  BookOpen,
+  Star,
+  Eye,
+  Bookmark,
+  BookmarkCheck,
+  Clock,
+  ListOrdered,
+  Search,
+  ChevronRight,
+  RefreshCw,
+} from "lucide-react";
 import { GlobalAffiliate, PopupAffiliate, SidebarAffiliate } from "@/features/affiliate/components";
 
 export const Route = createFileRoute("/truyen/$slug/")({
   head: ({ params }) => {
-    const story = STORIES.find(s => s.slug === params.slug);
+    const story = STORIES.find((s) => s.slug === params.slug);
     const title = story ? `${story.title} — ${story.authorName}` : "Truyện";
     const desc = story?.description?.slice(0, 160) ?? "Đọc truyện online miễn phí.";
     return {
       meta: [
-        { title: `${title} | Truyện Việt` },
+        { title: `${title} | Thu Hải Đường` },
         { name: "description", content: desc },
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
@@ -40,7 +51,9 @@ function NotFoundView() {
       <SiteHeader />
       <div className="container mx-auto flex-1 px-4 py-20 text-center">
         <h1 className="text-2xl font-bold">Không tìm thấy truyện</h1>
-        <Link to="/truyen" className="text-primary underline">← Quay lại danh sách</Link>
+        <Link to="/truyen" className="text-primary underline">
+          ← Quay lại danh sách
+        </Link>
       </div>
       <SiteFooter />
     </div>
@@ -97,7 +110,11 @@ function StoryDetailPage() {
   const allChapters = chaptersQ.data ?? [];
 
   const filtered = keyword
-    ? allChapters.filter(c => c.title.toLowerCase().includes(keyword.toLowerCase()) || String(c.number).includes(keyword))
+    ? allChapters.filter(
+        (c) =>
+          c.title.toLowerCase().includes(keyword.toLowerCase()) ||
+          String(c.number).includes(keyword),
+      )
     : allChapters;
   const ordered = order === "asc" ? filtered : [...filtered].reverse();
   const totalPages = Math.max(1, Math.ceil(ordered.length / CHAPTERS_PER_PAGE));
@@ -115,9 +132,13 @@ function StoryDetailPage() {
         <section className="border-b border-border bg-gradient-to-br from-primary/5 via-background to-accent/20">
           <div className="container mx-auto px-4 py-8">
             <nav className="mb-4 text-sm text-muted-foreground">
-              <Link to="/" className="hover:text-foreground">Trang chủ</Link>
+              <Link to="/" className="hover:text-foreground">
+                Trang chủ
+              </Link>
               <span className="mx-2">/</span>
-              <Link to="/truyen" className="hover:text-foreground">Truyện</Link>
+              <Link to="/truyen" className="hover:text-foreground">
+                Truyện
+              </Link>
               <span className="mx-2">/</span>
               <span className="text-foreground">{story.title}</span>
             </nav>
@@ -133,29 +154,53 @@ function StoryDetailPage() {
                   Tác giả: <span className="text-foreground">{story.authorName}</span>
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {story.categories.map(c => (
-                    <Badge key={c.id} variant="secondary">{c.name}</Badge>
+                  {story.categories.map((c) => (
+                    <Badge key={c.id} variant="secondary">
+                      {c.name}
+                    </Badge>
                   ))}
                   <Badge>{STATUS_LABEL[story.status]}</Badge>
                   <Badge variant="outline">{COUNTRY_LABEL[story.country] ?? story.country}</Badge>
                 </div>
                 <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                  <Stat icon={<Eye className="h-4 w-4" />} label="Lượt đọc" value={formatViews(story.totalViews)} />
-                  <Stat icon={<Star className="h-4 w-4 fill-amber-400 text-amber-400" />} label="Đánh giá" value={`${story.averageRating} (${story.ratingCount})`} />
-                  <Stat icon={<BookOpen className="h-4 w-4" />} label="Số chương" value={String(story.totalChapters)} />
-                  <Stat icon={<Clock className="h-4 w-4" />} label="Cập nhật" value={new Date(story.lastChapterAt ?? Date.now()).toLocaleDateString("vi-VN")} />
+                  <Stat
+                    icon={<Eye className="h-4 w-4" />}
+                    label="Lượt đọc"
+                    value={formatViews(story.totalViews)}
+                  />
+                  <Stat
+                    icon={<Star className="h-4 w-4 fill-amber-400 text-amber-400" />}
+                    label="Đánh giá"
+                    value={`${story.averageRating} (${story.ratingCount})`}
+                  />
+                  <Stat
+                    icon={<BookOpen className="h-4 w-4" />}
+                    label="Số chương"
+                    value={String(story.totalChapters)}
+                  />
+                  <Stat
+                    icon={<Clock className="h-4 w-4" />}
+                    label="Cập nhật"
+                    value={new Date(story.lastChapterAt ?? Date.now()).toLocaleDateString("vi-VN")}
+                  />
                 </div>
                 <div className="mt-6 flex flex-wrap gap-3">
                   {firstChapter && (
                     <Button asChild>
-                      <Link to="/truyen/$slug/chuong-{$number}" params={{ slug: story.slug, number: String(firstChapter.number) }}>
+                      <Link
+                        to="/truyen/$slug/chuong-{$number}"
+                        params={{ slug: story.slug, number: String(firstChapter.number) }}
+                      >
                         <BookOpen className="mr-2 h-4 w-4" /> Đọc từ đầu
                       </Link>
                     </Button>
                   )}
                   {latestChapter && (
                     <Button asChild variant="secondary">
-                      <Link to="/truyen/$slug/chuong-{$number}" params={{ slug: story.slug, number: String(latestChapter.number) }}>
+                      <Link
+                        to="/truyen/$slug/chuong-{$number}"
+                        params={{ slug: story.slug, number: String(latestChapter.number) }}
+                      >
                         Chương mới nhất <ChevronRight className="ml-1 h-4 w-4" />
                       </Link>
                     </Button>
@@ -167,12 +212,13 @@ function StoryDetailPage() {
           </div>
         </section>
 
-
         {/* Description + sidebar (sidebar chỉ hiển thị trên md+) */}
         <section className="container mx-auto grid gap-8 px-4 py-8 md:grid-cols-[1fr_280px]">
           <div>
             <h2 className="mb-3 text-lg font-semibold">Giới thiệu</h2>
-            <p className="whitespace-pre-line leading-relaxed text-foreground/90">{story.description}</p>
+            <p className="whitespace-pre-line leading-relaxed text-foreground/90">
+              {story.description}
+            </p>
           </div>
           <SidebarAffiliate storyId={story.id} />
         </section>
@@ -189,11 +235,18 @@ function StoryDetailPage() {
                 <Input
                   placeholder="Tìm chương..."
                   value={keyword}
-                  onChange={e => { setKeyword(e.target.value); setPage(1); }}
+                  onChange={(e) => {
+                    setKeyword(e.target.value);
+                    setPage(1);
+                  }}
                   className="w-56 pl-8"
                 />
               </div>
-              <Button variant="outline" size="sm" onClick={() => setOrder(o => o === "asc" ? "desc" : "asc")}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setOrder((o) => (o === "asc" ? "desc" : "asc"))}
+              >
                 Sắp xếp: {order === "asc" ? "Cũ → Mới" : "Mới → Cũ"}
               </Button>
             </div>
@@ -208,13 +261,18 @@ function StoryDetailPage() {
           ) : chaptersQ.isError ? (
             <div className="rounded-lg border border-dashed border-destructive/50 bg-card py-10 text-center">
               <p className="text-muted-foreground">Không tải được danh sách chương.</p>
-              <Button variant="outline" size="sm" className="mt-3" onClick={() => chaptersQ.refetch()}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-3"
+                onClick={() => chaptersQ.refetch()}
+              >
                 <RefreshCw className="mr-2 h-4 w-4" /> Thử lại
               </Button>
             </div>
           ) : (
             <div className="grid gap-1 rounded-lg border border-border bg-card p-2 sm:grid-cols-2 lg:grid-cols-3">
-              {pageItems.map(ch => (
+              {pageItems.map((ch) => (
                 <Link
                   key={ch.number}
                   to="/truyen/$slug/chuong-{$number}"
@@ -232,9 +290,25 @@ function StoryDetailPage() {
 
           {totalPages > 1 && (
             <div className="mt-4 flex items-center justify-center gap-2">
-              <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(p => p - 1)}>Trước</Button>
-              <span className="text-sm text-muted-foreground">Trang {page} / {totalPages}</span>
-              <Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage(p => p + 1)}>Sau</Button>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page === 1}
+                onClick={() => setPage((p) => p - 1)}
+              >
+                Trước
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                Trang {page} / {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page === totalPages}
+                onClick={() => setPage((p) => p + 1)}
+              >
+                Sau
+              </Button>
             </div>
           )}
         </section>
@@ -248,7 +322,9 @@ function StoryDetailPage() {
 function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
     <div className="rounded-md border border-border bg-card/60 p-3">
-      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">{icon} {label}</div>
+      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        {icon} {label}
+      </div>
       <div className="mt-1 text-sm font-semibold">{value}</div>
     </div>
   );
@@ -267,13 +343,20 @@ function BookmarkButton({ slug }: { slug: string }) {
     onError: (e: Error) => toast.error(e.message || "Thao tác thất bại"),
   });
   return (
-    <Button variant={marked ? "secondary" : "outline"} onClick={() => mut.mutate()} disabled={mut.isPending}>
+    <Button
+      variant={marked ? "secondary" : "outline"}
+      onClick={() => mut.mutate()}
+      disabled={mut.isPending}
+    >
       {marked ? (
-        <><BookmarkCheck className="mr-2 h-4 w-4" /> Đã đánh dấu</>
+        <>
+          <BookmarkCheck className="mr-2 h-4 w-4" /> Đã đánh dấu
+        </>
       ) : (
-        <><Bookmark className="mr-2 h-4 w-4" /> Đánh dấu</>
+        <>
+          <Bookmark className="mr-2 h-4 w-4" /> Đánh dấu
+        </>
       )}
     </Button>
   );
 }
-

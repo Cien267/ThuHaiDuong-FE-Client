@@ -28,9 +28,9 @@ export function SiteHeader() {
   const [q, setQ] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
-  const user = useAuthStore(s => s.user);
-  const status = useAuthStore(s => s.status);
-  const logout = useAuthStore(s => s.logout);
+  const user = useAuthStore((s) => s.user);
+  const status = useAuthStore((s) => s.status);
+  const logout = useAuthStore((s) => s.logout);
 
   async function handleLogout() {
     await logout();
@@ -62,7 +62,7 @@ export function SiteHeader() {
                   <span className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
                     <BookMarked className="h-4 w-4" />
                   </span>
-                  Truyện Việt
+                  Thu Hải Đường
                 </SheetTitle>
               </SheetHeader>
 
@@ -74,7 +74,7 @@ export function SiteHeader() {
                       <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                       <Input
                         value={q}
-                        onChange={e => setQ(e.target.value)}
+                        onChange={(e) => setQ(e.target.value)}
                         placeholder="Tìm truyện, tác giả..."
                         className="pl-9"
                       />
@@ -99,8 +99,16 @@ export function SiteHeader() {
 
                   {/* Primary nav */}
                   <nav className="grid gap-1">
-                    <MobileNavLink to="/" label="Trang chủ" onNavigate={() => setMobileOpen(false)} />
-                    <MobileNavLink to="/truyen" label="Danh sách truyện" onNavigate={() => setMobileOpen(false)} />
+                    <MobileNavLink
+                      to="/"
+                      label="Trang chủ"
+                      onNavigate={() => setMobileOpen(false)}
+                    />
+                    <MobileNavLink
+                      to="/truyen"
+                      label="Danh sách truyện"
+                      onNavigate={() => setMobileOpen(false)}
+                    />
                     <MobileNavLink
                       to="/truyen"
                       search={{ sortBy: "TotalViews", sortDesc: true }}
@@ -108,7 +116,11 @@ export function SiteHeader() {
                       onNavigate={() => setMobileOpen(false)}
                     />
                     {status === "authenticated" && (
-                      <MobileNavLink to="/tu-sach" label="Tủ sách" onNavigate={() => setMobileOpen(false)} />
+                      <MobileNavLink
+                        to="/tu-sach"
+                        label="Tủ sách"
+                        onNavigate={() => setMobileOpen(false)}
+                      />
                     )}
                   </nav>
 
@@ -117,7 +129,7 @@ export function SiteHeader() {
                       Thể loại
                     </div>
                     <div className="grid grid-cols-2 gap-1">
-                      {CATEGORIES.map(c => (
+                      {CATEGORIES.map((c) => (
                         <SheetClose asChild key={c.id}>
                           <Link
                             to="/truyen"
@@ -137,7 +149,9 @@ export function SiteHeader() {
                         Tài khoản
                       </div>
                       <div className="mb-2 truncate px-1 text-sm">
-                        <div className="truncate font-medium">{user.displayName || user.username}</div>
+                        <div className="truncate font-medium">
+                          {user.displayName || user.username}
+                        </div>
                         <div className="truncate text-xs text-muted-foreground">{user.email}</div>
                       </div>
                       <Button
@@ -162,7 +176,7 @@ export function SiteHeader() {
             <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground md:h-9 md:w-9">
               <BookMarked className="h-4 w-4 md:h-5 md:w-5" />
             </div>
-            <span className="hidden text-lg font-bold sm:inline">Truyện Việt</span>
+            <span className="hidden text-lg font-bold sm:inline">Thu Hải Đường</span>
           </Link>
 
           <nav className="ml-2 hidden items-center gap-1 md:flex">
@@ -184,7 +198,7 @@ export function SiteHeader() {
                 Thể loại
               </button>
               <div className="invisible absolute left-0 top-full z-50 grid w-[480px] grid-cols-3 gap-1 rounded-md border border-border bg-popover p-2 opacity-0 shadow-lg transition-all group-hover:visible group-hover:opacity-100">
-                {CATEGORIES.map(c => (
+                {CATEGORIES.map((c) => (
                   <Link
                     key={c.id}
                     to="/truyen"
@@ -208,7 +222,7 @@ export function SiteHeader() {
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={q}
-              onChange={e => setQ(e.target.value)}
+              onChange={(e) => setQ(e.target.value)}
               placeholder="Tìm truyện, tác giả..."
               className="pl-9"
             />
@@ -233,9 +247,7 @@ export function SiteHeader() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="gap-2">
                   <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold text-primary">
-                    {(user.displayName || user.username || user.email)
-                      .slice(0, 1)
-                      .toUpperCase()}
+                    {(user.displayName || user.username || user.email).slice(0, 1).toUpperCase()}
                   </span>
                   <span className="hidden max-w-[120px] truncate sm:inline">
                     {user.displayName || user.username}

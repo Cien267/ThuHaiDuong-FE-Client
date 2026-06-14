@@ -1,15 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import {
-  BookOpen,
-  BookmarkX,
-  Library,
-  Clock,
-  ChevronRight,
-  RefreshCw,
-  Inbox,
-} from "lucide-react";
+import { BookOpen, BookmarkX, Library, Clock, ChevronRight, RefreshCw, Inbox } from "lucide-react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { Button } from "@/components/ui/button";
@@ -21,8 +13,11 @@ import type { BookmarkItem } from "@/features/library/types";
 export const Route = createFileRoute("/tu-sach")({
   head: () => ({
     meta: [
-      { title: "Tủ sách của bạn — Truyện Việt" },
-      { name: "description", content: "Danh sách truyện đã đánh dấu và tiếp tục đọc theo tiến độ." },
+      { title: "Tủ sách của bạn — Thu Hải Đường" },
+      {
+        name: "description",
+        content: "Danh sách truyện đã đánh dấu và tiếp tục đọc theo tiến độ.",
+      },
       { name: "robots", content: "noindex,follow" },
     ],
   }),
@@ -30,7 +25,7 @@ export const Route = createFileRoute("/tu-sach")({
 });
 
 function LibraryPage() {
-  const status = useAuthStore(s => s.status);
+  const status = useAuthStore((s) => s.status);
   const { data, isPending, isError, error, refetch, isFetching } = useQuery(bookmarksQuery());
 
   const items = data ?? [];
@@ -63,7 +58,9 @@ function LibraryPage() {
             </p>
             <div className="flex gap-2">
               <Button asChild size="sm" variant="outline">
-                <Link to="/dang-nhap" search={{ redirect: "/tu-sach" }}>Đăng nhập</Link>
+                <Link to="/dang-nhap" search={{ redirect: "/tu-sach" }}>
+                  Đăng nhập
+                </Link>
               </Button>
               <Button asChild size="sm">
                 <Link to="/dang-ky">Đăng ký</Link>
@@ -80,7 +77,7 @@ function LibraryPage() {
           <EmptyState />
         ) : (
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {items.map(item => (
+            {items.map((item) => (
               <BookmarkCard key={item.story.slug} item={item} />
             ))}
           </ul>
@@ -93,7 +90,8 @@ function LibraryPage() {
 
 function BookmarkCard({ item }: { item: BookmarkItem }) {
   const qc = useQueryClient();
-  const { story, lastReadChapterNumber, lastReadChapterTitle, lastReadAt, latestChapterNumber } = item;
+  const { story, lastReadChapterNumber, lastReadChapterTitle, lastReadAt, latestChapterNumber } =
+    item;
   const total = latestChapterNumber ?? story.totalChapters ?? 0;
   const current = lastReadChapterNumber ?? 0;
   const pct = total > 0 ? Math.min(100, Math.round((current / total) * 100)) : 0;
@@ -138,21 +136,21 @@ function BookmarkCard({ item }: { item: BookmarkItem }) {
         <p className="mt-0.5 truncate text-xs text-muted-foreground">{story.authorName}</p>
 
         <div className="mt-2 flex flex-wrap gap-1">
-          {story.categories.slice(0, 2).map(c => (
+          {story.categories.slice(0, 2).map((c) => (
             <Badge key={c.id} variant="secondary" className="text-[10px]">
               {c.name}
             </Badge>
           ))}
-          {hasUnread && (
-            <Badge className="text-[10px]">+{total - current} chương mới</Badge>
-          )}
+          {hasUnread && <Badge className="text-[10px]">+{total - current} chương mới</Badge>}
         </div>
 
         <div className="mt-2 text-xs text-muted-foreground">
           {lastReadChapterNumber ? (
             <span className="line-clamp-1">
-              Đang đọc: <span className="text-foreground">
-                Chương {lastReadChapterNumber}{lastReadChapterTitle ? ` — ${lastReadChapterTitle}` : ""}
+              Đang đọc:{" "}
+              <span className="text-foreground">
+                Chương {lastReadChapterNumber}
+                {lastReadChapterTitle ? ` — ${lastReadChapterTitle}` : ""}
               </span>
             </span>
           ) : (
@@ -226,7 +224,8 @@ function EmptyState() {
       <Inbox className="mx-auto h-10 w-10 text-muted-foreground/60" />
       <h2 className="mt-3 text-lg font-semibold">Tủ sách trống</h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Khám phá truyện và bấm <span className="font-medium text-foreground">"Đánh dấu"</span> để thêm vào tủ sách.
+        Khám phá truyện và bấm <span className="font-medium text-foreground">"Đánh dấu"</span> để
+        thêm vào tủ sách.
       </p>
       <Button asChild className="mt-4">
         <Link to="/truyen">Khám phá truyện</Link>

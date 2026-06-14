@@ -20,17 +20,14 @@ const registerSchema = z
     password: z.string().min(6, "Mật khẩu tối thiểu 6 ký tự").max(72, "Mật khẩu tối đa 72 ký tự"),
     confirm: z.string(),
   })
-  .refine(d => d.password === d.confirm, {
+  .refine((d) => d.password === d.confirm, {
     path: ["confirm"],
     message: "Mật khẩu nhập lại không khớp",
   });
 
 export const Route = createFileRoute("/dang-ky")({
   head: () => ({
-    meta: [
-      { title: "Đăng ký — Truyện Việt" },
-      { name: "robots", content: "noindex,follow" },
-    ],
+    meta: [{ title: "Đăng ký — Thu Hải Đường" }, { name: "robots", content: "noindex,follow" }],
   }),
   component: RegisterPage,
 });
@@ -39,8 +36,8 @@ type FieldErrors = Partial<Record<"username" | "email" | "password" | "confirm" 
 
 function RegisterPage() {
   const navigate = useNavigate();
-  const status = useAuthStore(s => s.status);
-  const register = useAuthStore(s => s.register);
+  const status = useAuthStore((s) => s.status);
+  const register = useAuthStore((s) => s.register);
 
   const [form, setForm] = useState({ username: "", email: "", password: "", confirm: "" });
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -51,7 +48,7 @@ function RegisterPage() {
   }, [status, navigate]);
 
   function setField<K extends keyof typeof form>(k: K, v: string) {
-    setForm(prev => ({ ...prev, [k]: v }));
+    setForm((prev) => ({ ...prev, [k]: v }));
   }
 
   async function onSubmit(e: React.FormEvent) {
@@ -99,19 +96,21 @@ function RegisterPage() {
               <label className="mb-1 block text-sm font-medium">Tên đăng nhập</label>
               <Input
                 value={form.username}
-                onChange={e => setField("username", e.target.value)}
+                onChange={(e) => setField("username", e.target.value)}
                 placeholder="docgia01"
                 autoComplete="username"
                 disabled={submitting}
               />
-              {errors.username && <p className="mt-1 text-xs text-destructive">{errors.username}</p>}
+              {errors.username && (
+                <p className="mt-1 text-xs text-destructive">{errors.username}</p>
+              )}
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium">Email</label>
               <Input
                 type="email"
                 value={form.email}
-                onChange={e => setField("email", e.target.value)}
+                onChange={(e) => setField("email", e.target.value)}
                 placeholder="you@example.com"
                 autoComplete="email"
                 disabled={submitting}
@@ -123,19 +122,21 @@ function RegisterPage() {
               <Input
                 type="password"
                 value={form.password}
-                onChange={e => setField("password", e.target.value)}
+                onChange={(e) => setField("password", e.target.value)}
                 placeholder="Tối thiểu 6 ký tự"
                 autoComplete="new-password"
                 disabled={submitting}
               />
-              {errors.password && <p className="mt-1 text-xs text-destructive">{errors.password}</p>}
+              {errors.password && (
+                <p className="mt-1 text-xs text-destructive">{errors.password}</p>
+              )}
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium">Nhập lại mật khẩu</label>
               <Input
                 type="password"
                 value={form.confirm}
-                onChange={e => setField("confirm", e.target.value)}
+                onChange={(e) => setField("confirm", e.target.value)}
                 autoComplete="new-password"
                 disabled={submitting}
               />

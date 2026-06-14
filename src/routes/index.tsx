@@ -11,13 +11,13 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Truyện Việt — Đọc truyện online ngôn tình, kiếm hiệp, tiên hiệp" },
+      { title: "Thu Hải Đường — Đọc truyện online ngôn tình, kiếm hiệp, tiên hiệp" },
       {
         name: "description",
         content:
           "Đọc truyện online miễn phí: ngôn tình, kiếm hiệp, tiên hiệp, đô thị, huyền huyễn. Cập nhật chương mới mỗi ngày.",
       },
-      { property: "og:title", content: "Truyện Việt — Đọc truyện online" },
+      { property: "og:title", content: "Thu Hải Đường — Đọc truyện online" },
       {
         property: "og:description",
         content: "Nền tảng đọc truyện online với hàng nghìn bộ truyện đa dạng thể loại.",
@@ -28,10 +28,16 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
-  const hotQ = useQuery(storiesQuery({ sortBy: "TotalViews", sortDesc: true, page: 1, pageSize: 6 }));
-  const newestQ = useQuery(storiesQuery({ sortBy: "LastChapterAt", sortDesc: true, page: 1, pageSize: 8 }));
+  const hotQ = useQuery(
+    storiesQuery({ sortBy: "TotalViews", sortDesc: true, page: 1, pageSize: 6 }),
+  );
+  const newestQ = useQuery(
+    storiesQuery({ sortBy: "LastChapterAt", sortDesc: true, page: 1, pageSize: 8 }),
+  );
   const completedQ = useQuery(storiesQuery({ storyType: "Completed", page: 1, pageSize: 6 }));
-  const topQ = useQuery(storiesQuery({ sortBy: "TotalViews", sortDesc: true, page: 1, pageSize: 10 }));
+  const topQ = useQuery(
+    storiesQuery({ sortBy: "TotalViews", sortDesc: true, page: 1, pageSize: 10 }),
+  );
   const serialQ = useQuery(storiesQuery({ storyType: "Serial", page: 1, pageSize: 1 }));
 
   const hot = hotQ.data?.items ?? [];
@@ -51,7 +57,8 @@ function HomePage() {
               Đắm chìm trong thế giới truyện
             </h1>
             <p className="mt-3 text-base text-muted-foreground md:text-lg">
-              Hàng nghìn bộ truyện ngôn tình, kiếm hiệp, tiên hiệp và đô thị. Đọc miễn phí, cập nhật liên tục.
+              Hàng nghìn bộ truyện ngôn tình, kiếm hiệp, tiên hiệp và đô thị. Đọc miễn phí, cập nhật
+              liên tục.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Button size="lg" asChild>
@@ -70,7 +77,7 @@ function HomePage() {
       {/* Category chips */}
       <section className="border-b border-border bg-card">
         <div className="container mx-auto flex flex-wrap gap-2 px-4 py-4">
-          {CATEGORIES.map(c => (
+          {CATEGORIES.map((c) => (
             <Link
               key={c.id}
               to="/truyen"
@@ -87,34 +94,55 @@ function HomePage() {
         <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
           <div className="space-y-10">
             {/* Hot */}
-            <Section title="Truyện hot" icon={<Flame className="h-5 w-5 text-orange-500" />} href="/truyen" hrefSearch={{ sortBy: "TotalViews", sortDesc: true }}>
+            <Section
+              title="Truyện hot"
+              icon={<Flame className="h-5 w-5 text-orange-500" />}
+              href="/truyen"
+              hrefSearch={{ sortBy: "TotalViews", sortDesc: true }}
+            >
               {hotQ.isPending ? (
                 <CardSkeletons count={6} />
               ) : (
                 <div className="grid gap-4 sm:grid-cols-2">
-                  {hot.map(s => <StoryCard key={s.id} story={s} />)}
+                  {hot.map((s) => (
+                    <StoryCard key={s.id} story={s} />
+                  ))}
                 </div>
               )}
             </Section>
 
             {/* Newest */}
-            <Section title="Mới cập nhật" icon={<Clock className="h-5 w-5 text-blue-500" />} href="/truyen" hrefSearch={{ sortBy: "LastChapterAt", sortDesc: true }}>
+            <Section
+              title="Mới cập nhật"
+              icon={<Clock className="h-5 w-5 text-blue-500" />}
+              href="/truyen"
+              hrefSearch={{ sortBy: "LastChapterAt", sortDesc: true }}
+            >
               {newestQ.isPending ? (
                 <CardSkeletons count={8} />
               ) : (
                 <div className="grid gap-4 sm:grid-cols-2">
-                  {newest.map(s => <StoryCard key={s.id} story={s} />)}
+                  {newest.map((s) => (
+                    <StoryCard key={s.id} story={s} />
+                  ))}
                 </div>
               )}
             </Section>
 
             {/* Completed */}
-            <Section title="Truyện hoàn thành" icon={<Sparkles className="h-5 w-5 text-emerald-500" />} href="/truyen" hrefSearch={{ storyType: "Completed" }}>
+            <Section
+              title="Truyện hoàn thành"
+              icon={<Sparkles className="h-5 w-5 text-emerald-500" />}
+              href="/truyen"
+              hrefSearch={{ storyType: "Completed" }}
+            >
               {completedQ.isPending ? (
                 <CardSkeletons count={6} />
               ) : (
                 <div className="grid gap-4 sm:grid-cols-2">
-                  {completed.map(s => <StoryCard key={s.id} story={s} />)}
+                  {completed.map((s) => (
+                    <StoryCard key={s.id} story={s} />
+                  ))}
                 </div>
               )}
             </Section>
@@ -135,9 +163,7 @@ function HomePage() {
                     ))}
                   </div>
                 ) : (
-                  topRank.map((s, i) => (
-                    <StoryCardCompact key={s.id} story={s} rank={i + 1} />
-                  ))
+                  topRank.map((s, i) => <StoryCardCompact key={s.id} story={s} rank={i + 1} />)
                 )}
               </div>
             </div>
@@ -145,9 +171,22 @@ function HomePage() {
             <div className="rounded-lg border border-border bg-card p-4">
               <h2 className="text-base font-bold">Thống kê</h2>
               <dl className="mt-3 space-y-2 text-sm">
-                <div className="flex justify-between"><dt className="text-muted-foreground">Tổng truyện</dt><dd className="font-medium">{(topQ.data?.totalCount ?? 0).toLocaleString("vi-VN")}</dd></div>
-                <div className="flex justify-between"><dt className="text-muted-foreground">Thể loại</dt><dd className="font-medium">{CATEGORIES.length}</dd></div>
-                <div className="flex justify-between"><dt className="text-muted-foreground">Đang ra</dt><dd className="font-medium">{(serialQ.data?.totalCount ?? 0).toLocaleString("vi-VN")}</dd></div>
+                <div className="flex justify-between">
+                  <dt className="text-muted-foreground">Tổng truyện</dt>
+                  <dd className="font-medium">
+                    {(topQ.data?.totalCount ?? 0).toLocaleString("vi-VN")}
+                  </dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-muted-foreground">Thể loại</dt>
+                  <dd className="font-medium">{CATEGORIES.length}</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-muted-foreground">Đang ra</dt>
+                  <dd className="font-medium">
+                    {(serialQ.data?.totalCount ?? 0).toLocaleString("vi-VN")}
+                  </dd>
+                </div>
               </dl>
             </div>
           </aside>
