@@ -58,10 +58,7 @@ export function SiteHeader() {
             </SheetTrigger>
             <SheetContent side="left" className="w-[88vw] max-w-sm p-0">
               <SheetHeader className="border-b border-border px-4 py-3">
-                <SheetTitle className="flex items-center gap-2">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
-                    <BookMarked className="h-4 w-4" />
-                  </span>
+                <SheetTitle className="text-lg bg-linear-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent font-extrabold! inline-block font-[Lavishly_Yours]!">
                   Thu Hải Đường
                 </SheetTitle>
               </SheetHeader>
@@ -90,7 +87,7 @@ export function SiteHeader() {
                         </Button>
                       </SheetClose>
                       <SheetClose asChild>
-                        <Button asChild size="sm">
+                        <Button variant="greenShiny" asChild size="sm">
                           <Link to="/dang-ky">Đăng ký</Link>
                         </Button>
                       </SheetClose>
@@ -172,11 +169,11 @@ export function SiteHeader() {
             </SheetContent>
           </Sheet>
 
-          <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground md:h-9 md:w-9">
-              <BookMarked className="h-4 w-4 md:h-5 md:w-5" />
-            </div>
-            <span className="hidden text-lg font-bold sm:inline">Thu Hải Đường</span>
+          <Link
+            to="/"
+            className="text-lg bg-linear-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent font-extrabold! inline-block font-[Lavishly_Yours]!"
+          >
+            Thu Hải Đường
           </Link>
 
           <nav className="ml-2 hidden items-center gap-1 md:flex">
@@ -283,7 +280,7 @@ export function SiteHeader() {
                   Đăng nhập
                 </Link>
               </Button>
-              <Button size="sm" asChild className="hidden sm:inline-flex">
+              <Button variant="greenShiny" size="sm" asChild className="hidden sm:inline-flex">
                 <Link to="/dang-ky">Đăng ký</Link>
               </Button>
             </>

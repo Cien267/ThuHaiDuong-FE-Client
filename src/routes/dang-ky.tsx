@@ -147,7 +147,7 @@ function RegisterPage() {
                 {errors.form}
               </p>
             )}
-            <Button type="submit" className="w-full" disabled={submitting}>
+            <Button variant="greenShiny" type="submit" className="w-full" disabled={submitting}>
               {submitting ? "Đang tạo tài khoản..." : "Đăng ký"}
             </Button>
           </form>

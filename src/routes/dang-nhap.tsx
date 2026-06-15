@@ -113,7 +113,7 @@ function LoginPage() {
                 {errors.form}
               </p>
             )}
-            <Button type="submit" className="w-full" disabled={submitting}>
+            <Button variant="greenShiny" type="submit" className="w-full" disabled={submitting}>
               {submitting ? "Đang đăng nhập..." : "Đăng nhập"}
             </Button>
           </form>

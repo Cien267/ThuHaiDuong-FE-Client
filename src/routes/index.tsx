@@ -61,7 +61,7 @@ function HomePage() {
               liên tục.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Button size="lg" asChild>
+              <Button variant="greenShiny" size="lg" asChild>
                 <Link to="/truyen">Khám phá ngay</Link>
               </Button>
               <Button size="lg" variant="outline" asChild>

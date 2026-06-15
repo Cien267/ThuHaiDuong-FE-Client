@@ -106,7 +106,9 @@ export function SidebarAffiliate({ storyId, chapterId }: Ctx) {
             className="mb-2 aspect-video w-full rounded object-cover"
           />
         )}
-        <h3 className="text-sm font-semibold leading-snug group-hover:text-primary">{link.title}</h3>
+        <h3 className="text-sm font-semibold leading-snug group-hover:text-primary">
+          {link.title}
+        </h3>
         {link.description && (
           <p className="mt-1 line-clamp-3 text-xs text-muted-foreground">{link.description}</p>
         )}
@@ -160,7 +162,9 @@ export function GlobalAffiliate({ storyId, chapterId }: Ctx) {
         >
           <span className="truncate font-medium">{link.title}</span>
           {link.description && (
-            <span className="hidden truncate text-muted-foreground sm:inline">— {link.description}</span>
+            <span className="hidden truncate text-muted-foreground sm:inline">
+              — {link.description}
+            </span>
           )}
         </AdAnchor>
         <Button
@@ -231,8 +235,10 @@ export function PopupAffiliate({ storyId, chapterId }: Ctx) {
             <DialogDescription className="sr-only">{link.title}</DialogDescription>
           )}
           <div className="flex justify-end gap-2 pt-1">
-            <Button variant="ghost" onClick={() => setOpen(false)}>Để sau</Button>
-            <Button asChild>
+            <Button variant="ghost" onClick={() => setOpen(false)}>
+              Để sau
+            </Button>
+            <Button variant="greenShiny" asChild>
               <AdAnchor link={link} chapterId={chapterId}>
                 {link.ctaText || "Tìm hiểu thêm"} <ExternalLink className="ml-1 h-4 w-4" />
               </AdAnchor>

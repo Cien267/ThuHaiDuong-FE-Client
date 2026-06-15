@@ -62,7 +62,7 @@ function LibraryPage() {
                   Đăng nhập
                 </Link>
               </Button>
-              <Button asChild size="sm">
+              <Button variant="greenShiny" asChild size="sm">
                 <Link to="/dang-ky">Đăng ký</Link>
               </Button>
             </div>
@@ -175,7 +175,7 @@ function BookmarkCard({ item }: { item: BookmarkItem }) {
         )}
 
         <div className="mt-auto flex gap-2 pt-3">
-          <Button asChild size="sm" className="flex-1">
+          <Button variant="greenShiny" asChild size="sm" className="flex-1">
             <Link
               to="/truyen/$slug/chuong-{$number}"
               params={{ slug: story.slug, number: String(nextChapter) }}
@@ -227,7 +227,7 @@ function EmptyState() {
         Khám phá truyện và bấm <span className="font-medium text-foreground">"Đánh dấu"</span> để
         thêm vào tủ sách.
       </p>
-      <Button asChild className="mt-4">
+      <Button variant="greenShiny" asChild className="mt-4">
         <Link to="/truyen">Khám phá truyện</Link>
       </Button>
     </div>

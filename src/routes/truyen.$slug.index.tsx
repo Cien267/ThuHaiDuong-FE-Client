@@ -186,7 +186,7 @@ function StoryDetailPage() {
                 </div>
                 <div className="mt-6 flex flex-wrap gap-3">
                   {firstChapter && (
-                    <Button asChild>
+                    <Button variant="greenShiny" asChild>
                       <Link
                         to="/truyen/$slug/chuong-{$number}"
                         params={{ slug: story.slug, number: String(firstChapter.number) }}

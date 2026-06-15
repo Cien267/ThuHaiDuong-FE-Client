@@ -93,6 +93,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
+      {
+        rel: "preconnect",
+        href: "https://fonts.googleapis.com",
+      },
+      {
+        rel: "preconnect",
+        href: "https://fonts.gstatic.com",
+        crossOrigin: "anonymous",
+      },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Lavishly+Yours&family=Shadows+Into+Light&family=Story+Script&display=swap",
+      },
     ],
   }),
   shellComponent: RootShell,
@@ -117,7 +130,7 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const hydrate = useAuthStore(s => s.hydrate);
+  const hydrate = useAuthStore((s) => s.hydrate);
 
   useEffect(() => {
     void hydrate();
