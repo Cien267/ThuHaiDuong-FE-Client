@@ -28,7 +28,7 @@ export const Route = createFileRoute("/truyen/$slug/")({
   head: ({ params }) => {
     const story = STORIES.find((s) => s.slug === params.slug);
     const title = story ? `${story.title} — ${story.authorName}` : "Truyện";
-    const desc = story?.description?.slice(0, 160) ?? "Đọc truyện online miễn phí.";
+    const desc = story?.description?.slice(0, 160) ?? "Đọc truyện online.";
     return {
       meta: [
         { title: `${title} | Thu Hải Đường` },
@@ -159,7 +159,7 @@ function StoryDetailPage() {
                       {c.name}
                     </Badge>
                   ))}
-                  <Badge>{STATUS_LABEL[story.status]}</Badge>
+                  <Badge variant="greenShiny">{STATUS_LABEL[story.status]}</Badge>
                   <Badge variant="outline">{COUNTRY_LABEL[story.country] ?? story.country}</Badge>
                 </div>
                 <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">

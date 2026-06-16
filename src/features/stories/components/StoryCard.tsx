@@ -9,7 +9,7 @@ export function StoryCard({ story }: { story: StorySummary }) {
     <Link
       to="/truyen/$slug"
       params={{ slug: story.slug }}
-      className="group flex gap-3 rounded-lg border border-border bg-card p-3 transition-all hover:border-primary/40 hover:shadow-md"
+      className="group flex gap-3 rounded-lg border border-border bg-card p-3 transition-all hover:border-emerald-500/40 hover:shadow-md"
     >
       <div className="relative h-32 w-24 flex-shrink-0 overflow-hidden rounded-md bg-muted">
         {story.coverImageUrl && (
@@ -37,7 +37,10 @@ export function StoryCard({ story }: { story: StorySummary }) {
           <span className="inline-flex items-center gap-1">
             <BookOpen className="h-3 w-3" /> {story.totalChapters}
           </span>
-          <Badge variant={story.status === "Completed" ? "secondary" : "default"} className="ml-auto text-[10px]">
+          <Badge
+            variant={story.status === "Completed" ? "secondary" : "default"}
+            className="ml-auto text-[10px]"
+          >
             {STATUS_LABEL[story.status]}
           </Badge>
         </div>
@@ -68,7 +71,9 @@ export function StoryCardCompact({ story, rank }: { story: StorySummary; rank?: 
         </p>
         <p className="line-clamp-1 text-xs text-muted-foreground">{story.authorName}</p>
       </div>
-      <span className="flex-shrink-0 text-xs text-muted-foreground">{formatViews(story.totalViews)}</span>
+      <span className="flex-shrink-0 text-xs text-muted-foreground">
+        {formatViews(story.totalViews)}
+      </span>
     </Link>
   );
 }

@@ -72,7 +72,7 @@ export function SiteFooter() {
           </div>
         </div>
         <div className="mt-8 border-t border-border pt-6 text-center text-xs text-muted-foreground">
-          © {new Date().getFullYear()} Thu Hải Đường. Đọc truyện online miễn phí.
+          © {new Date().getFullYear()} Thu Hải Đường. Đọc truyện online.
         </div>
       </div>
     </footer>
