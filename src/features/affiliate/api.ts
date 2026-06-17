@@ -16,7 +16,7 @@ interface FetchParams {
 export async function fetchAffiliateLinks(params: FetchParams): Promise<AffiliateLink[]> {
   if (!params.storyId) return [];
   try {
-    const { data } = await api.get("/affiliate-links", {
+    const { data } = await api.get("/affiliate/display", {
       params: {
         storyId: params.storyId,
         ...(params.chapterId ? { chapterId: params.chapterId } : {}),
@@ -33,7 +33,7 @@ export async function fetchAffiliateLinks(params: FetchParams): Promise<Affiliat
 
 export const affiliateLinksQuery = (params: FetchParams) =>
   queryOptions({
-    queryKey: ["affiliate-links", params.storyId ?? null, params.chapterId ?? null],
+    queryKey: ["affiliate/display", params.storyId ?? null, params.chapterId ?? null],
     queryFn: () => fetchAffiliateLinks(params),
     enabled: !!params.storyId,
     staleTime: 5 * 60_000,
@@ -42,7 +42,7 @@ export const affiliateLinksQuery = (params: FetchParams) =>
 
 export function pickByPlacement(links: AffiliateLink[] | undefined, placement: AffiliatePlacement) {
   if (!links?.length) return null;
-  return links.find(l => l.placement === placement) ?? null;
+  return links.find((l) => l.placement === placement) ?? null;
 }
 
 /**

@@ -68,25 +68,27 @@ function ChapterReaderPage() {
 
   const navigate = useNavigate();
   const [settings, setSettings] = useReaderSettings();
-
-  const chapterQ = useQuery({ ...chapterQuery(slug, num), enabled: validNumber });
-  const chapter = chapterQ.data ?? null;
   const storyQ = useQuery(storyQuery(slug));
   const storyId = storyQ.data?.id ?? null;
+
+  const chapterQ = useQuery({
+    ...chapterQuery(storyId ?? "", num),
+    enabled: validNumber && !!storyId,
+  });
+  const chapter = chapterQ.data ?? null;
+
   const chapterId = chapter?.id ?? null;
 
-  const sanitized = useMemo(
-    () => (chapter ? sanitizeChapterHtml(chapter.contentHtml) : ""),
-    [chapter],
-  );
+  const sanitized = useMemo(() => (chapter ? sanitizeChapterHtml(chapter.content) : ""), [chapter]);
 
   // Ghi nhận tiến độ đọc (forward-only, best-effort)
   useEffect(() => {
-    if (chapter) void updateProgress(slug, chapter.number, chapter.title);
+    if (chapter) void updateProgress(slug, chapter.chapterNumber, chapter.title);
   }, [slug, chapter]);
 
-  const prevNum = chapter && chapter.number > 1 ? chapter.number - 1 : null;
-  const nextNum = chapter && chapter.number < chapter.totalChapters ? chapter.number + 1 : null;
+  const prevNum = chapter && chapter.chapterNumber > 1 ? chapter.chapterNumber - 1 : null;
+  const nextNum =
+    chapter && chapter.chapterNumber < chapter.totalChapters ? chapter.chapterNumber + 1 : null;
 
   const goTo = (n: number | null) => {
     if (n == null) return;
@@ -177,7 +179,11 @@ function ChapterReaderPage() {
             </Link>
           </div>
           <div className="flex items-center gap-1">
-            <ChapterListSheet storySlug={slug} currentNumber={chapter.number} />
+            <ChapterListSheet
+              storySlug={slug}
+              storyId={storyId ?? ""}
+              currentNumber={chapter.chapterNumber}
+            />
             <ReaderSettingsPopover settings={settings} setSettings={setSettings} />
           </div>
         </div>
@@ -198,7 +204,7 @@ function ChapterReaderPage() {
             prev={prevNum}
             next={nextNum}
             totalChapters={chapter.totalChapters}
-            current={chapter.number}
+            current={chapter.chapterNumber}
             onGo={goTo}
           />
 
@@ -220,7 +226,7 @@ function ChapterReaderPage() {
               prev={prevNum}
               next={nextNum}
               totalChapters={chapter.totalChapters}
-              current={chapter.number}
+              current={chapter.chapterNumber}
               onGo={goTo}
             />
           </div>
@@ -290,12 +296,14 @@ function NavRow({
 
 function ChapterListSheet({
   storySlug,
+  storyId,
   currentNumber,
 }: {
   storySlug: string;
+  storyId: string;
   currentNumber: number;
 }) {
-  const chaptersQ = useQuery(chaptersQuery(storySlug));
+  const chaptersQ = useQuery(chaptersQuery(storyId));
   const chapters = chaptersQ.data ?? [];
   return (
     <Sheet>
@@ -318,11 +326,11 @@ function ChapterListSheet({
           ) : (
             <ul className="space-y-1">
               {chapters.map((c) => (
-                <li key={c.number}>
+                <li key={c.chapterNumber}>
                   <Link
                     to="/truyen/$slug/chuong-{$number}"
-                    params={{ slug: storySlug, number: String(c.number) }}
-                    className={`block rounded px-3 py-2 text-sm hover:bg-accent ${c.number === currentNumber ? "bg-accent font-semibold" : ""}`}
+                    params={{ slug: storySlug, number: String(c.chapterNumber) }}
+                    className={`block rounded px-3 py-2 text-sm hover:bg-accent ${c.chapterNumber === currentNumber ? "bg-accent font-semibold" : ""}`}
                   >
                     {c.title}
                   </Link>

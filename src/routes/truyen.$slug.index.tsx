@@ -63,7 +63,7 @@ function NotFoundView() {
 function StoryDetailPage() {
   const { slug } = Route.useParams();
   const storyQ = useQuery(storyQuery(slug));
-  const chaptersQ = useQuery(chaptersQuery(slug));
+  const chaptersQ = useQuery(chaptersQuery(storyQ.data?.id ?? ""));
 
   const [keyword, setKeyword] = useState("");
   const [page, setPage] = useState(1);
@@ -113,7 +113,7 @@ function StoryDetailPage() {
     ? allChapters.filter(
         (c) =>
           c.title.toLowerCase().includes(keyword.toLowerCase()) ||
-          String(c.number).includes(keyword),
+          String(c.chapterNumber).includes(keyword),
       )
     : allChapters;
   const ordered = order === "asc" ? filtered : [...filtered].reverse();
@@ -189,7 +189,7 @@ function StoryDetailPage() {
                     <Button variant="greenShiny" asChild>
                       <Link
                         to="/truyen/$slug/chuong-{$number}"
-                        params={{ slug: story.slug, number: String(firstChapter.number) }}
+                        params={{ slug: story.slug, number: String(firstChapter.chapterNumber) }}
                       >
                         <BookOpen className="mr-2 h-4 w-4" /> Đọc từ đầu
                       </Link>
@@ -199,7 +199,7 @@ function StoryDetailPage() {
                     <Button asChild variant="secondary">
                       <Link
                         to="/truyen/$slug/chuong-{$number}"
-                        params={{ slug: story.slug, number: String(latestChapter.number) }}
+                        params={{ slug: story.slug, number: String(latestChapter.chapterNumber) }}
                       >
                         Chương mới nhất <ChevronRight className="ml-1 h-4 w-4" />
                       </Link>
@@ -274,9 +274,9 @@ function StoryDetailPage() {
             <div className="grid gap-1 rounded-lg border border-border bg-card p-2 sm:grid-cols-2 lg:grid-cols-3">
               {pageItems.map((ch) => (
                 <Link
-                  key={ch.number}
+                  key={ch.chapterNumber}
                   to="/truyen/$slug/chuong-{$number}"
-                  params={{ slug: story.slug, number: String(ch.number) }}
+                  params={{ slug: story.slug, number: String(ch.chapterNumber) }}
                   className="flex items-center justify-between rounded px-3 py-2 text-sm hover:bg-accent"
                 >
                   <span className="truncate">{ch.title}</span>
