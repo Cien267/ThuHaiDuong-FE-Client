@@ -86,10 +86,6 @@ function ChapterReaderPage() {
     if (chapter) void updateProgress(slug, chapter.chapterNumber, chapter.title);
   }, [slug, chapter]);
 
-  const prevNum = chapter && chapter.chapterNumber > 1 ? chapter.chapterNumber - 1 : null;
-  const nextNum =
-    chapter && chapter.chapterNumber < chapter.totalChapters ? chapter.chapterNumber + 1 : null;
-
   const goTo = (n: number | null) => {
     if (n == null) return;
     navigate({ to: "/truyen/$slug/chuong-{$number}", params: { slug, number: String(n) } });
@@ -107,16 +103,16 @@ function ChapterReaderPage() {
         return;
       if (e.key === "ArrowLeft") {
         e.preventDefault();
-        goTo(prevNum);
+        goTo(chapter?.prevChapter?.chapterNumber ?? null);
       } else if (e.key === "ArrowRight") {
         e.preventDefault();
-        goTo(nextNum);
+        goTo(chapter?.nextChapter?.chapterNumber ?? null);
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prevNum, nextNum, slug]);
+  }, [slug]);
 
   if (!validNumber) return <NotFoundView />;
 
@@ -201,8 +197,8 @@ function ChapterReaderPage() {
           <h2 className="mb-8 text-center text-lg font-semibold opacity-80">{chapter.title}</h2>
 
           <NavRow
-            prev={prevNum}
-            next={nextNum}
+            prev={chapter?.prevChapter?.chapterNumber ?? null}
+            next={chapter?.nextChapter?.chapterNumber ?? null}
             totalChapters={chapter.totalChapters}
             current={chapter.chapterNumber}
             onGo={goTo}
@@ -223,8 +219,8 @@ function ChapterReaderPage() {
 
           <div className="mt-10">
             <NavRow
-              prev={prevNum}
-              next={nextNum}
+              prev={chapter?.prevChapter?.chapterNumber ?? null}
+              next={chapter?.nextChapter?.chapterNumber ?? null}
               totalChapters={chapter.totalChapters}
               current={chapter.chapterNumber}
               onGo={goTo}

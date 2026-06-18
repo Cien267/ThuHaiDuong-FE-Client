@@ -3,7 +3,7 @@ export type AffiliatePlacement = "in-chapter" | "sidebar" | "popup" | "global";
 export interface AffiliateLink {
   id: string;
   placement: AffiliatePlacement;
-  title: string;
+  name: string;
   description?: string | null;
   imageUrl?: string | null;
   ctaText?: string | null;

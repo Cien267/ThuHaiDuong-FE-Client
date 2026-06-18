@@ -13,8 +13,7 @@ export const CATEGORIES: CategoryNode[] = [
   { id: "c10", name: "Khoa huyễn", slug: "khoa-huyen" },
 ];
 
-const cover = (seed: string) =>
-  `https://picsum.photos/seed/${encodeURIComponent(seed)}/300/420`;
+const cover = (seed: string) => `https://picsum.photos/seed/${encodeURIComponent(seed)}/300/420`;
 
 const titles = [
   "Đấu Phá Thương Khung",
@@ -64,11 +63,13 @@ const descriptions = [
 ];
 
 export const STORIES: StorySummary[] = Array.from({ length: 48 }, (_, i) => {
-  const title = titles[i % titles.length] + (i >= titles.length ? ` ${Math.floor(i / titles.length) + 1}` : "");
+  const title =
+    titles[i % titles.length] + (i >= titles.length ? ` ${Math.floor(i / titles.length) + 1}` : "");
   const author = authors[i % authors.length];
   const cat1 = CATEGORIES[i % CATEGORIES.length];
   const cat2 = CATEGORIES[(i + 3) % CATEGORIES.length];
-  const status: StorySummary["status"] = i % 7 === 0 ? "Completed" : i % 11 === 0 ? "Paused" : "Publishing";
+  const status: StorySummary["status"] =
+    i % 7 === 0 ? "Completed" : i % 11 === 0 ? "Paused" : "Publishing";
   const country: StorySummary["country"] = (["CN", "CN", "CN", "VN", "KR", "JP"] as const)[i % 6];
   return {
     id: `s${i + 1}`,
@@ -86,7 +87,7 @@ export const STORIES: StorySummary[] = Array.from({ length: 48 }, (_, i) => {
     averageRating: Math.round((3.5 + ((i * 13) % 15) / 10) * 10) / 10,
     ratingCount: 50 + ((i * 17) % 5000),
     lastChapterAt: new Date(Date.now() - i * 3600_000 * 5).toISOString(),
-    categories: [cat1, cat2].filter((v, idx, arr) => arr.findIndex(x => x.id === v.id) === idx),
+    categories: [cat1, cat2].filter((v, idx, arr) => arr.findIndex((x) => x.id === v.id) === idx),
     tags: [],
   };
 });
@@ -99,30 +100,36 @@ export function filterStories(opts: {
   sortBy?: string;
   sortDesc?: boolean;
 }) {
-  let items = STORIES.filter(s => s.status !== "Paused");
+  let items = STORIES.filter((s) => s.status !== "Paused");
   if (opts.keyword) {
     const k = opts.keyword.toLowerCase();
     items = items.filter(
-      s => s.title.toLowerCase().includes(k) || s.authorName.toLowerCase().includes(k),
+      (s) => s.title.toLowerCase().includes(k) || s.authorName.toLowerCase().includes(k),
     );
   }
   if (opts.categorySlug) {
-    items = items.filter(s => s.categories.some(c => c.slug === opts.categorySlug));
+    items = items.filter((s) => s.categories.some((c) => c.slug === opts.categorySlug));
   }
-  if (opts.country) items = items.filter(s => s.country === opts.country);
-  if (opts.storyType) items = items.filter(s => s.storyType === opts.storyType);
+  if (opts.country) items = items.filter((s) => s.country === opts.country);
+  if (opts.storyType) items = items.filter((s) => s.storyType === opts.storyType);
 
   const desc = opts.sortDesc ?? true;
   const sortBy = opts.sortBy ?? "LastChapterAt";
   items = [...items].sort((a, b) => {
     let cmp = 0;
     switch (sortBy) {
-      case "TotalViews": cmp = a.totalViews - b.totalViews; break;
-      case "AverageRating": cmp = a.averageRating - b.averageRating; break;
-      case "Title": cmp = a.title.localeCompare(b.title, "vi"); break;
+      case "TotalViews":
+        cmp = a.totalViews - b.totalViews;
+        break;
+      case "AverageRating":
+        cmp = a.averageRating - b.averageRating;
+        break;
+      case "Title":
+        cmp = a.title.localeCompare(b.title, "vi");
+        break;
       case "LastChapterAt":
       default:
-        cmp = (a.lastChapterAt ?? "").localeCompare(b.lastChapterAt ?? "");
+        cmp = (a.lastChapterAt ?? null).localeCompare(b.lastChapterAt ?? null);
     }
     return desc ? -cmp : cmp;
   });

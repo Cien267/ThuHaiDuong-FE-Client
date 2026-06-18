@@ -6,13 +6,23 @@ export interface ChapterSummary {
   title: string;
   publishedAt: string;
   wordCount: number;
+  isVip: boolean;
+  status: "Draft" | "Published" | "Scheduled" | "Hidden";
 }
 
+export interface ChapterNavItem {
+  id: string;
+  title: string;
+  chapterNumber: number;
+  isVip: boolean;
+}
 export interface ChapterDetail extends ChapterSummary {
   storyId: string;
   storyTitle: string;
   content: string;
   totalChapters: number;
+  nextChapter?: ChapterNavItem;
+  prevChapter?: ChapterNavItem;
 }
 
 const PARAGRAPHS = [
@@ -34,6 +44,8 @@ export function getChaptersForStory(storyId: string): ChapterSummary[] {
     title: `Chương ${i + 1}: ${["Khởi đầu", "Tương ngộ", "Đối đầu", "Bí mật", "Đột phá", "Sinh tử", "Trùng phùng", "Quyết chiến"][i % 8]}`,
     publishedAt: new Date(Date.now() - (story.totalChapters - i) * 3600_000 * 6).toISOString(),
     wordCount: 1800 + ((i * 137) % 1500),
+    isVip: false,
+    status: "Published",
   }));
 }
 

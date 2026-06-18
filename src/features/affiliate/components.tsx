@@ -30,7 +30,7 @@ function AdAnchor({
       href={buildClickUrl(link.redirectUrl, chapterId)}
       target="_blank"
       rel="nofollow sponsored noopener noreferrer"
-      aria-label={ariaLabel ?? link.title}
+      aria-label={ariaLabel ?? link.name}
       className={className}
     >
       {children}
@@ -71,7 +71,7 @@ export function InChapterAffiliate({ storyId, chapterId }: Ctx) {
             />
           )}
           <div className="min-w-0 flex-1">
-            <h3 className="font-semibold leading-snug group-hover:text-primary">{link.title}</h3>
+            <h3 className="font-semibold leading-snug group-hover:text-primary">{link.name}</h3>
             {link.description && (
               <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{link.description}</p>
             )}
@@ -106,9 +106,7 @@ export function SidebarAffiliate({ storyId, chapterId }: Ctx) {
             className="mb-2 aspect-video w-full rounded object-cover"
           />
         )}
-        <h3 className="text-sm font-semibold leading-snug group-hover:text-primary">
-          {link.title}
-        </h3>
+        <h3 className="text-sm font-semibold leading-snug group-hover:text-primary">{link.name}</h3>
         {link.description && (
           <p className="mt-1 line-clamp-3 text-xs text-muted-foreground">{link.description}</p>
         )}
@@ -160,7 +158,7 @@ export function GlobalAffiliate({ storyId, chapterId }: Ctx) {
           chapterId={chapterId}
           className="flex min-w-0 flex-1 items-center gap-2 text-sm hover:underline"
         >
-          <span className="truncate font-medium">{link.title}</span>
+          <span className="truncate font-medium">{link.name}</span>
           {link.description && (
             <span className="hidden truncate text-muted-foreground sm:inline">
               — {link.description}
@@ -228,11 +226,11 @@ export function PopupAffiliate({ storyId, chapterId }: Ctx) {
           />
         )}
         <div className="space-y-3 p-5">
-          <DialogTitle className="text-lg">{link.title}</DialogTitle>
+          <DialogTitle className="text-lg">{link.name}</DialogTitle>
           {link.description ? (
             <DialogDescription>{link.description}</DialogDescription>
           ) : (
-            <DialogDescription className="sr-only">{link.title}</DialogDescription>
+            <DialogDescription className="sr-only">{link.name}</DialogDescription>
           )}
           <div className="flex justify-end gap-2 pt-1">
             <Button variant="ghost" onClick={() => setOpen(false)}>

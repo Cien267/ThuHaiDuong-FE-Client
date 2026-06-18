@@ -65,7 +65,7 @@ export const api = axios.create({
 });
 
 // Gắn Bearer token (nếu có) vào mọi request
-api.interceptors.request.use(config => {
+api.interceptors.request.use((config) => {
   const token = tokenStorage.getAccess();
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
@@ -94,7 +94,7 @@ async function refreshAccessToken(): Promise<string | null> {
 type RetriableConfig = InternalAxiosRequestConfig & { _retry?: boolean };
 
 api.interceptors.response.use(
-  response => response,
+  (response) => response,
   async (error: AxiosError) => {
     const original = error.config as RetriableConfig | undefined;
     if (
@@ -122,15 +122,14 @@ export function toApiError(error: unknown): ApiRequestError {
   const e = error as AxiosError<{ message?: string; errors?: Record<string, string[]> }>;
   if (e && e.isAxiosError) {
     const statusCode = e.response?.status ?? 0;
-    const contentType = String(e.response?.headers?.["content-type"] ?? "");
+    const contentType = String(e.response?.headers?.["content-type"] ?? null);
     // Nhận HTML thay vì JSON ⇒ request không tới được API .NET (rơi vào SSR/proxy lỗi)
     const unreachable = !e.response || statusCode >= 500 || contentType.includes("text/html");
     const message =
       (typeof e.response?.data === "object" && e.response?.data?.message) ||
       e.message ||
       "Đã có lỗi xảy ra";
-    const errors =
-      typeof e.response?.data === "object" ? e.response?.data?.errors : undefined;
+    const errors = typeof e.response?.data === "object" ? e.response?.data?.errors : undefined;
     return new ApiRequestError(message, statusCode, errors, unreachable);
   }
   return new ApiRequestError(

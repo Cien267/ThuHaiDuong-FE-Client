@@ -63,7 +63,11 @@ function NotFoundView() {
 function StoryDetailPage() {
   const { slug } = Route.useParams();
   const storyQ = useQuery(storyQuery(slug));
-  const chaptersQ = useQuery(chaptersQuery(storyQ.data?.id ?? ""));
+
+  const chaptersQ = useQuery({
+    ...chaptersQuery(storyQ.data?.id ?? ""),
+    enabled: !!storyQ.data?.id,
+  });
 
   const [keyword, setKeyword] = useState("");
   const [page, setPage] = useState(1);
