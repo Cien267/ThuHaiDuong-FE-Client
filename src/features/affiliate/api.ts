@@ -52,5 +52,8 @@ export function pickByPlacement(links: AffiliateLink[] | undefined, placement: A
 export function buildClickUrl(redirectUrl: string, chapterId?: string | null): string {
   if (!chapterId) return redirectUrl;
   const sep = redirectUrl.includes("?") ? "&" : "?";
-  return `${redirectUrl}${sep}chapterId=${encodeURIComponent(chapterId)}`;
+  return (
+    (import.meta.env.VITE_API_BASE_URL || "/api → http://localhost:5129") +
+    `${redirectUrl}${sep}chapterId=${encodeURIComponent(chapterId)}`
+  );
 }
