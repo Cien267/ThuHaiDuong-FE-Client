@@ -148,7 +148,7 @@ function StoryDetailPage() {
             </nav>
             <div className="grid gap-6 md:grid-cols-[220px_1fr]">
               <img
-                src={story.coverImageUrl ?? ""}
+                src={story.coverImageUrl ?? undefined}
                 alt={story.title}
                 className="aspect-[5/7] w-full max-w-[220px] rounded-lg border border-border object-cover shadow-md"
               />

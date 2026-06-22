@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
-import { getChapter } from "@/features/stories/chapters";
+import { ChapterSummary, getChapter } from "@/features/stories/chapters";
 import { chapterQuery, chaptersQuery, storyQuery } from "@/features/stories/api";
 import { updateProgress } from "@/features/library/api";
 import { sanitizeChapterHtml } from "@/features/reader/sanitize";
@@ -75,6 +75,12 @@ function ChapterReaderPage() {
     ...chapterQuery(storyId ?? "", num),
     enabled: validNumber && !!storyId,
   });
+
+  const chaptersQ = useQuery(chaptersQuery(storyId ?? ""));
+  const chapters = chaptersQ.data ?? [];
+
+  console.log([chaptersQ]);
+
   const chapter = chapterQ.data ?? null;
 
   const chapterId = chapter?.id ?? null;
@@ -177,7 +183,8 @@ function ChapterReaderPage() {
           <div className="flex items-center gap-1">
             <ChapterListSheet
               storySlug={slug}
-              storyId={storyId ?? ""}
+              chapters={chapters}
+              isPending={chaptersQ.isPending}
               currentNumber={chapter.chapterNumber}
             />
             <ReaderSettingsPopover settings={settings} setSettings={setSettings} />
@@ -199,7 +206,7 @@ function ChapterReaderPage() {
           <NavRow
             prev={chapter?.prevChapter?.chapterNumber ?? null}
             next={chapter?.nextChapter?.chapterNumber ?? null}
-            totalChapters={chapter.totalChapters}
+            totalChapters={chapters.length}
             current={chapter.chapterNumber}
             onGo={goTo}
           />
@@ -221,7 +228,7 @@ function ChapterReaderPage() {
             <NavRow
               prev={chapter?.prevChapter?.chapterNumber ?? null}
               next={chapter?.nextChapter?.chapterNumber ?? null}
-              totalChapters={chapter.totalChapters}
+              totalChapters={chapters.length}
               current={chapter.chapterNumber}
               onGo={goTo}
             />
@@ -292,15 +299,15 @@ function NavRow({
 
 function ChapterListSheet({
   storySlug,
-  storyId,
+  chapters,
+  isPending,
   currentNumber,
 }: {
   storySlug: string;
-  storyId: string;
+  chapters: ChapterSummary[];
+  isPending: boolean;
   currentNumber: number;
 }) {
-  const chaptersQ = useQuery(chaptersQuery(storyId));
-  const chapters = chaptersQ.data ?? [];
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -313,7 +320,7 @@ function ChapterListSheet({
           <SheetTitle>Danh sách chương</SheetTitle>
         </SheetHeader>
         <ScrollArea className="mt-4 h-[calc(100vh-6rem)] pr-3">
-          {chaptersQ.isPending ? (
+          {isPending ? (
             <div className="space-y-2">
               {Array.from({ length: 12 }, (_, i) => (
                 <div key={i} className="h-9 animate-pulse rounded bg-muted/50" />

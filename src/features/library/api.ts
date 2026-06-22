@@ -55,7 +55,7 @@ async function resolveStory(slug: string): Promise<StorySummary | null> {
     return data as StorySummary;
   } catch (err) {
     if (isBackendUnavailable(err)) {
-      return STORIES.find(s => s.slug === slug) ?? null;
+      return STORIES.find((s) => s.slug === slug) ?? null;
     }
     return null;
   }
