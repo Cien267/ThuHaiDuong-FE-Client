@@ -5,11 +5,12 @@ import { z } from "zod";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { StoryCard } from "@/features/stories/components/StoryCard";
-import { CATEGORIES, COUNTRY_LABEL } from "@/features/stories/mock-data";
-import { storiesQuery } from "@/features/stories/api";
+import { COUNTRY_LABEL } from "@/features/stories/mock-data";
+import { storiesQuery, categoriesQuery } from "@/features/stories/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { X, RefreshCw } from "lucide-react";
+import { flattenCategories } from "@/features/stories/categories";
 
 const searchSchema = z.object({
   keyword: fallback(z.string(), "").default(""),
@@ -58,6 +59,9 @@ function BrowsePage() {
       pageSize: PAGE_SIZE,
     }),
   );
+
+  const categoriesQ = useQuery(categoriesQuery());
+  const flatCategories = flattenCategories(categoriesQ.data ?? []);
 
   const items = listQ.data?.items ?? [];
   const totalCount = listQ.data?.totalCount ?? 0;
@@ -114,7 +118,7 @@ function BrowsePage() {
               >
                 Tất cả
               </SelectChip>
-              {CATEGORIES.map((c) => (
+              {flatCategories.map((c) => (
                 <SelectChip
                   key={c.id}
                   active={search.categorySlug === c.slug}

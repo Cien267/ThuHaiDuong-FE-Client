@@ -147,6 +147,7 @@ export const COUNTRY_LABEL: Record<string, string> = {
   VN: "Việt Nam",
   KR: "Hàn Quốc",
   JP: "Nhật Bản",
+  EN: "Anh / Mỹ",
 };
 
 export const STATUS_LABEL: Record<StorySummary["status"], string> = {

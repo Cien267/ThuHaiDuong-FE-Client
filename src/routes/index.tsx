@@ -4,9 +4,10 @@ import { Flame, Sparkles, Trophy, Clock } from "lucide-react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { StoryCard, StoryCardCompact } from "@/features/stories/components/StoryCard";
-import { CATEGORIES } from "@/features/stories/mock-data";
 import { storiesQuery } from "@/features/stories/api";
 import { Button } from "@/components/ui/button";
+import { flattenCategories } from "@/features/stories/categories";
+import { categoriesQuery } from "@/features/stories/api";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -39,6 +40,9 @@ function HomePage() {
     storiesQuery({ sortBy: "TotalViews", sortDesc: true, page: 1, pageSize: 10 }),
   );
   const serialQ = useQuery(storiesQuery({ storyType: "Serial", page: 1, pageSize: 1 }));
+
+  const categoriesQ = useQuery(categoriesQuery());
+  const flatCategories = flattenCategories(categoriesQ.data ?? []);
 
   const hot = hotQ.data?.items ?? [];
   const newest = newestQ.data?.items ?? [];
@@ -77,7 +81,7 @@ function HomePage() {
       {/* Category chips */}
       <section className="border-b border-border bg-card">
         <div className="container mx-auto flex flex-wrap gap-2 px-4 py-4">
-          {CATEGORIES.map((c) => (
+          {flatCategories.map((c) => (
             <Link
               key={c.id}
               to="/truyen"
@@ -179,7 +183,7 @@ function HomePage() {
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-muted-foreground">Thể loại</dt>
-                  <dd className="font-medium">{CATEGORIES.length}</dd>
+                  <dd className="font-medium">{flatCategories.length}</dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-muted-foreground">Đang ra</dt>

@@ -2,6 +2,7 @@ import { keepPreviousData, queryOptions } from "@tanstack/react-query";
 import { api, ApiRequestError, isBackendUnavailable } from "@/lib/api/client";
 import type { StorySummary } from "./types";
 import type { ChapterDetail, ChapterSummary } from "./chapters";
+import type { CategorySummary } from "./categories";
 import { STORIES, filterStories } from "./mock-data";
 import { getChapter, getChaptersForStory } from "./chapters";
 
@@ -94,6 +95,17 @@ export async function fetchStories(params: StoryListParams): Promise<PagedResult
   }
 }
 
+export async function fetchCategories(): Promise<CategorySummary[]> {
+  try {
+    const { data } = await api.get("/categories/tree");
+    return data as CategorySummary[];
+  } catch (err) {
+    if (!isBackendUnavailable(err)) throw err;
+    warnFallback();
+    return [];
+  }
+}
+
 export async function fetchStory(slug: string): Promise<StorySummary | null> {
   try {
     const { data } = await api.get(`/stories/${slug}`);
@@ -153,6 +165,14 @@ export const storyQuery = (slug: string) =>
     queryKey: ["story", slug],
     queryFn: () => fetchStory(slug),
     staleTime: 60_000,
+  });
+
+export const categoriesQuery = () =>
+  queryOptions({
+    queryKey: ["categories"],
+    queryFn: () => fetchCategories(),
+    staleTime: 60_000,
+    placeholderData: keepPreviousData,
   });
 
 export const chaptersQuery = (storyId: string) =>

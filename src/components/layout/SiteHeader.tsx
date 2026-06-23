@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Search, BookMarked, User, Menu, LogOut, Library, X, ChevronRight } from "lucide-react";
+import { Search, User, Menu, LogOut, Library, X, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,9 +20,11 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { CATEGORIES } from "@/features/stories/mock-data";
 import { useAuthStore } from "@/features/auth/store";
 import { toast } from "sonner";
+import { flattenCategories } from "@/features/stories/categories";
+import { categoriesQuery } from "@/features/stories/api";
+import { useQuery } from "@tanstack/react-query";
 
 export function SiteHeader() {
   const [q, setQ] = useState("");
@@ -31,6 +33,8 @@ export function SiteHeader() {
   const user = useAuthStore((s) => s.user);
   const status = useAuthStore((s) => s.status);
   const logout = useAuthStore((s) => s.logout);
+  const categoriesQ = useQuery(categoriesQuery());
+  const flatCategories = flattenCategories(categoriesQ.data ?? []);
 
   async function handleLogout() {
     await logout();
@@ -83,7 +87,14 @@ export function SiteHeader() {
                     <div className="grid grid-cols-2 gap-2">
                       <SheetClose asChild>
                         <Button asChild variant="outline" size="sm">
-                          <Link to="/dang-nhap">Đăng nhập</Link>
+                          <Link
+                            to="/dang-nhap"
+                            search={{
+                              redirect: undefined,
+                            }}
+                          >
+                            Đăng nhập
+                          </Link>
                         </Button>
                       </SheetClose>
                       <SheetClose asChild>
@@ -126,7 +137,7 @@ export function SiteHeader() {
                       Thể loại
                     </div>
                     <div className="grid grid-cols-2 gap-1">
-                      {CATEGORIES.map((c) => (
+                      {flatCategories.map((c) => (
                         <SheetClose asChild key={c.id}>
                           <Link
                             to="/truyen"
@@ -195,7 +206,7 @@ export function SiteHeader() {
                 Thể loại
               </button>
               <div className="invisible absolute left-0 top-full z-50 grid w-[480px] grid-cols-3 gap-1 rounded-md border border-border bg-popover p-2 opacity-0 shadow-lg transition-all group-hover:visible group-hover:opacity-100">
-                {CATEGORIES.map((c) => (
+                {flatCategories.map((c) => (
                   <Link
                     key={c.id}
                     to="/truyen"
@@ -275,7 +286,12 @@ export function SiteHeader() {
           ) : (
             <>
               <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex">
-                <Link to="/dang-nhap">
+                <Link
+                  to="/dang-nhap"
+                  search={{
+                    redirect: undefined,
+                  }}
+                >
                   <User className="mr-1 h-4 w-4" />
                   Đăng nhập
                 </Link>
