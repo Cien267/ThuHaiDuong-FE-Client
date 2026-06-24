@@ -29,6 +29,7 @@ import {
   InChapterAffiliate,
   PopupAffiliate,
 } from "@/features/affiliate/components";
+import { trackChapterView, getSessionId } from "@/features/analytics/api";
 
 export const Route = createFileRoute("/truyen/$slug/chuong-{$number}")({
   head: ({ params }) => {
@@ -69,7 +70,7 @@ function ChapterReaderPage() {
   const navigate = useNavigate();
   const [settings, setSettings] = useReaderSettings();
   const storyQ = useQuery(storyQuery(slug));
-  const storyId = storyQ.data?.id ?? null;
+  const storyId = storyQ.data?.id ?? "";
 
   const chapterQ = useQuery({
     ...chapterQuery(storyId ?? "", num),
@@ -83,14 +84,24 @@ function ChapterReaderPage() {
 
   const chapter = chapterQ.data ?? null;
 
-  const chapterId = chapter?.id ?? null;
+  const chapterId = chapter?.id ?? "";
 
   const sanitized = useMemo(() => (chapter ? sanitizeChapterHtml(chapter.content) : ""), [chapter]);
 
-  // Ghi nhận tiến độ đọc (forward-only, best-effort)
+  // Ghi nhận tiến độ đọc (forward-only, best-effort) + tracking view
   useEffect(() => {
     if (chapter) void updateProgress(slug, chapter.chapterNumber, chapter.title);
   }, [slug, chapter]);
+
+  useEffect(() => {
+    if (!chapter?.id || !storyId) return;
+
+    void trackChapterView({
+      chapterId: chapter.id,
+      storyId,
+      sessionId: getSessionId(),
+    });
+  }, [storyId, chapter?.id]);
 
   const goTo = (n: number | null) => {
     if (n == null) return;
