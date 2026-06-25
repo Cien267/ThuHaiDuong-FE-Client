@@ -6,7 +6,7 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { StoryCard } from "@/features/stories/components/StoryCard";
 import { COUNTRY_LABEL } from "@/features/stories/mock-data";
-import { storiesQuery, categoriesQuery } from "@/features/stories/api";
+import { storiesQuery, categoriesQuery, tagsQuery } from "@/features/stories/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { X, RefreshCw } from "lucide-react";
@@ -51,6 +51,7 @@ function BrowsePage() {
     storiesQuery({
       keyword: search.keyword || undefined,
       categorySlug: search.categorySlug || undefined,
+      tagSlug: search.tagSlug || undefined,
       country: search.country || undefined,
       storyType: search.storyType || undefined,
       sortBy: search.sortBy,
@@ -62,6 +63,9 @@ function BrowsePage() {
 
   const categoriesQ = useQuery(categoriesQuery());
   const flatCategories = flattenCategories(categoriesQ.data ?? []);
+
+  const tagsQ = useQuery(tagsQuery());
+  const tags = tagsQ.data ?? [];
 
   const items = listQ.data?.items ?? [];
   const totalCount = listQ.data?.totalCount ?? 0;
@@ -160,6 +164,21 @@ function BrowsePage() {
               >
                 Hoàn thành
               </SelectChip>
+            </FilterGroup>
+
+            <FilterGroup label="Thẻ">
+              <SelectChip active={!search.tagSlug} onClick={() => setSearch({ tagSlug: "" })}>
+                Tất cả
+              </SelectChip>
+              {tags.map((tag) => (
+                <SelectChip
+                  key={tag.id}
+                  active={search.tagSlug === tag.slug}
+                  onClick={() => setSearch({ tagSlug: tag.slug })}
+                >
+                  {tag.name}
+                </SelectChip>
+              ))}
             </FilterGroup>
 
             {hasFilters && (

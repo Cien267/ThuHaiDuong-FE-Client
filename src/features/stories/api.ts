@@ -5,6 +5,7 @@ import type { ChapterDetail, ChapterSummary } from "./chapters";
 import type { CategorySummary } from "./categories";
 import { STORIES, filterStories } from "./mock-data";
 import { getChapter, getChaptersForStory } from "./chapters";
+import { TagSummary } from "./tags";
 
 // ====== Kiểu dữ liệu ======
 
@@ -19,6 +20,7 @@ export interface PagedResult<T> {
 export interface StoryListParams {
   keyword?: string;
   categorySlug?: string;
+  tagSlug?: string;
   country?: string;
   storyType?: string;
   sortBy?: string;
@@ -106,6 +108,17 @@ export async function fetchCategories(): Promise<CategorySummary[]> {
   }
 }
 
+export async function fetchTags(): Promise<TagSummary[]> {
+  try {
+    const { data } = await api.get("/tags");
+    return data as TagSummary[];
+  } catch (err) {
+    if (!isBackendUnavailable(err)) throw err;
+    warnFallback();
+    return [];
+  }
+}
+
 export async function fetchStory(slug: string): Promise<StorySummary | null> {
   try {
     const { data } = await api.get(`/stories/${slug}`);
@@ -171,6 +184,14 @@ export const categoriesQuery = () =>
   queryOptions({
     queryKey: ["categories"],
     queryFn: () => fetchCategories(),
+    staleTime: 60_000,
+    placeholderData: keepPreviousData,
+  });
+
+export const tagsQuery = () =>
+  queryOptions({
+    queryKey: ["tags"],
+    queryFn: () => fetchTags(),
     staleTime: 60_000,
     placeholderData: keepPreviousData,
   });
