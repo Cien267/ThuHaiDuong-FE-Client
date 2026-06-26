@@ -164,7 +164,9 @@ function StoryDetailPage() {
                     </Badge>
                   ))}
                   <Badge variant="greenShiny">{STATUS_LABEL[story.status]}</Badge>
-                  <Badge variant="outline">{COUNTRY_LABEL[story.country] ?? story.country}</Badge>
+                  {story.country && (
+                    <Badge variant="outline">{COUNTRY_LABEL[story.country] ?? story.country}</Badge>
+                  )}
                 </div>
                 <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
                   <Stat

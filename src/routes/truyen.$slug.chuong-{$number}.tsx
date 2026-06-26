@@ -80,8 +80,6 @@ function ChapterReaderPage() {
   const chaptersQ = useQuery(chaptersQuery(storyId ?? ""));
   const chapters = chaptersQ.data ?? [];
 
-  console.log([chaptersQ]);
-
   const chapter = chapterQ.data ?? null;
 
   const chapterId = chapter?.id ?? "";
