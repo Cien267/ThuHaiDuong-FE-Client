@@ -59,7 +59,7 @@ export function StoryCardCompact({ story, rank }: { story: StorySummary; rank?: 
       {rank !== undefined && (
         <span
           className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded text-xs font-bold ${
-            rank <= 3 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+            rank <= 3 ? "bg-orange-400 text-primary-foreground" : "bg-muted text-muted-foreground"
           }`}
         >
           {rank}
