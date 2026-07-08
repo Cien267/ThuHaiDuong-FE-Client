@@ -1,11 +1,6 @@
 import { create } from "zustand";
 import { tokenStorage } from "@/lib/api/client";
-import {
-  fetchMe,
-  loginRequest,
-  logoutRequest,
-  registerRequest,
-} from "./api";
+import { fetchMe, loginRequest, logoutRequest, registerRequest } from "./api";
 import type { AuthUser, LoginPayload, RegisterPayload } from "./types";
 
 interface AuthState {
@@ -83,5 +78,5 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
 /** Tiện ích: gọi trong component gốc để khôi phục phiên đăng nhập (nếu có token) */
 export function useHydrateAuth() {
-  return useAuthStore(s => s.hydrate);
+  return useAuthStore((s) => s.hydrate);
 }

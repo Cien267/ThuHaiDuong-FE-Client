@@ -23,3 +23,49 @@ export interface CategoryNode {
   name: string;
   slug: string;
 }
+
+export interface Rating {
+  id: string;
+  storyId: string;
+  userId: string;
+  userName: string;
+  score: number; // 1-5
+  comment?: string | null;
+  createdAt: string;
+}
+
+export interface CreateRatingInput {
+  storyId: string;
+  score: number;
+  comment?: string;
+}
+
+export interface CommentAuthorInfo {
+  userId?: string | null;
+  userName?: string | null;
+  avatar?: string | null;
+  guestName?: string | null;
+  isGuest: boolean;
+}
+
+export interface Comment {
+  id: string;
+  storyId: string;
+  chapterId?: string | null;
+  parentCommentId?: string | null;
+  content: string;
+  likeCount: number;
+  isHidden: boolean;
+  author: CommentAuthorInfo;
+  replies: Comment[];
+  createdAt: string;
+}
+
+export interface CreateCommentInput {
+  storyId: string;
+  chapterId?: string | null;
+  parentCommentId?: string | null;
+  content: string;
+  guestName?: string;
+  guestEmail?: string;
+}

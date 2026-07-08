@@ -10,6 +10,11 @@ import { useAuthStore } from "@/features/auth/store";
 
 const registerSchema = z
   .object({
+    fullName: z
+      .string()
+      .trim()
+      .min(2, "Họ tên tối thiểu 2 ký tự")
+      .max(100, "Họ tên tối đa 100 ký tự"),
     username: z
       .string()
       .trim()
@@ -32,14 +37,22 @@ export const Route = createFileRoute("/dang-ky")({
   component: RegisterPage,
 });
 
-type FieldErrors = Partial<Record<"username" | "email" | "password" | "confirm" | "form", string>>;
+type FieldErrors = Partial<
+  Record<"fullName" | "username" | "email" | "password" | "confirm" | "form", string>
+>;
 
 function RegisterPage() {
   const navigate = useNavigate();
   const status = useAuthStore((s) => s.status);
   const register = useAuthStore((s) => s.register);
 
-  const [form, setForm] = useState({ username: "", email: "", password: "", confirm: "" });
+  const [form, setForm] = useState({
+    fullName: "",
+    username: "",
+    email: "",
+    password: "",
+    confirm: "",
+  });
   const [errors, setErrors] = useState<FieldErrors>({});
   const [submitting, setSubmitting] = useState(false);
 
@@ -67,6 +80,7 @@ function RegisterPage() {
     setSubmitting(true);
     try {
       await register({
+        fullName: parsed.data.fullName,
         username: parsed.data.username,
         email: parsed.data.email,
         password: parsed.data.password,
@@ -92,6 +106,19 @@ function RegisterPage() {
             Tạo tài khoản để lưu tủ sách & lịch sử đọc trên mọi thiết bị.
           </p>
           <form className="mt-6 space-y-4" onSubmit={onSubmit} noValidate>
+            <div>
+              <label className="mb-1 block text-sm font-medium">Họ tên</label>
+              <Input
+                value={form.fullName}
+                onChange={(e) => setField("fullName", e.target.value)}
+                placeholder="Nguyễn Văn A"
+                autoComplete="name"
+                disabled={submitting}
+              />
+              {errors.fullName && (
+                <p className="mt-1 text-xs text-destructive">{errors.fullName}</p>
+              )}
+            </div>
             <div>
               <label className="mb-1 block text-sm font-medium">Tên đăng nhập</label>
               <Input
@@ -153,7 +180,11 @@ function RegisterPage() {
           </form>
           <p className="mt-4 text-center text-sm text-muted-foreground">
             Đã có tài khoản?{" "}
-            <Link to="/dang-nhap" className="text-primary hover:underline">
+            <Link
+              to="/dang-nhap"
+              search={{ redirect: "/dang-ky" }}
+              className="text-primary hover:underline"
+            >
               Đăng nhập
             </Link>
           </p>

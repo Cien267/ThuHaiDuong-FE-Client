@@ -1,6 +1,6 @@
 import { keepPreviousData, queryOptions } from "@tanstack/react-query";
 import { api, ApiRequestError, isBackendUnavailable } from "@/lib/api/client";
-import type { StorySummary } from "./types";
+import type { StorySummary, Rating, CreateRatingInput, Comment, CreateCommentInput } from "./types";
 import type { ChapterDetail, ChapterSummary } from "./chapters";
 import type { CategorySummary } from "./categories";
 import { STORIES, filterStories } from "./mock-data";
@@ -149,6 +149,24 @@ export async function fetchChapters(storyId: string): Promise<ChapterSummary[]> 
   }
 }
 
+export async function fetchComments(
+  storyId: string,
+  chapterId?: string | null,
+): Promise<PagedResult<Comment>> {
+  try {
+    const { data } = await api.get(`/comments`, {
+      params: { storyId, chapterId },
+    });
+    return normalizePaged<Comment>(data, 1, 10_000);
+  } catch (err) {
+    if (isBackendUnavailable(err)) {
+      warnFallback();
+      return { items: [], page: 1, pageSize: 10_000, totalCount: 0, totalPages: 1 };
+    }
+    throw err;
+  }
+}
+
 export async function fetchChapter(storyId: string, number: number): Promise<ChapterDetail | null> {
   try {
     const { data } = await api.get(`/stories/${storyId}/chapters/${number}`);
@@ -161,6 +179,14 @@ export async function fetchChapter(storyId: string, number: number): Promise<Cha
     if (err instanceof ApiRequestError && err.statusCode === 404) return null;
     throw err;
   }
+}
+
+export function createRating(input: CreateRatingInput) {
+  return api.post<Rating>("/ratings", input);
+}
+
+export function createComment(input: CreateCommentInput) {
+  return api.post<Comment>("/comments", input);
 }
 
 // ====== Query options (TanStack Query) ======
@@ -208,4 +234,11 @@ export const chapterQuery = (storyId: string, number: number) =>
     queryKey: ["chapter", storyId, number],
     queryFn: () => fetchChapter(storyId, number),
     staleTime: 5 * 60_000,
+  });
+
+export const commentsQuery = (storyId: string, chapterId?: string | null) =>
+  queryOptions({
+    queryKey: ["comments", storyId, chapterId ?? "story"],
+    queryFn: () => fetchComments(storyId, chapterId),
+    staleTime: 60_000,
   });

@@ -23,6 +23,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { GlobalAffiliate, PopupAffiliate, SidebarAffiliate } from "@/features/affiliate/components";
+import { StoryReviews } from "@/features/stories/components/StoryReview";
 
 export const Route = createFileRoute("/truyen/$slug/")({
   head: ({ params }) => {
@@ -318,6 +319,12 @@ function StoryDetailPage() {
             </div>
           )}
         </section>
+        <StoryReviews
+          storyId={story.id}
+          storySlug={story.slug}
+          averageRating={story.averageRating}
+          ratingCount={story.ratingCount}
+        />
       </main>
       <SiteFooter />
       <PopupAffiliate storyId={story.id} />
