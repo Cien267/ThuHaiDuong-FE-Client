@@ -6,7 +6,7 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { bookmarksQuery, removeBookmark } from "@/features/library/api";
+import { bookmarksQuery, toggleBookmark } from "@/features/library/api";
 import { useAuthStore } from "@/features/auth/store";
 import type { BookmarkItem } from "@/features/library/types";
 
@@ -78,7 +78,7 @@ function LibraryPage() {
         ) : (
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {items.map((item) => (
-              <BookmarkCard key={item.story.slug} item={item} />
+              <BookmarkCard key={item.storySlug} item={item} />
             ))}
           </ul>
         )}
@@ -90,22 +90,32 @@ function LibraryPage() {
 
 function BookmarkCard({ item }: { item: BookmarkItem }) {
   const qc = useQueryClient();
-  const { story, lastReadChapterNumber, lastReadChapterTitle, lastReadAt, latestChapterNumber } =
-    item;
-  const total = latestChapterNumber ?? story.totalChapters ?? 0;
-  const current = lastReadChapterNumber ?? 0;
-  const pct = total > 0 ? Math.min(100, Math.round((current / total) * 100)) : 0;
-  const nextChapter = lastReadChapterNumber
-    ? Math.min(lastReadChapterNumber + 1, Math.max(total, lastReadChapterNumber + 1))
+  const {
+    totalChapters,
+    lastReadChapter,
+    storyId,
+    storySlug,
+    storyTitle,
+    storyCoverImageUrl,
+    authorName,
+    storyCategories,
+  } = item;
+  const current = lastReadChapter?.chapterNumber ?? 0;
+  const pct = totalChapters > 0 ? Math.min(100, Math.round((current / totalChapters) * 100)) : 0;
+  const nextChapter = lastReadChapter
+    ? Math.min(
+        lastReadChapter.chapterNumber + 1,
+        Math.max(totalChapters, lastReadChapter.chapterNumber + 1),
+      )
     : 1;
-  const hasUnread = total > 0 && current < total;
+  const hasUnread = totalChapters > 0 && current < totalChapters;
 
   const removeMut = useMutation({
-    mutationFn: () => removeBookmark(story.slug),
+    mutationFn: () => toggleBookmark(storyId),
     onSuccess: () => {
       toast.success("Đã xoá khỏi tủ sách");
       qc.invalidateQueries({ queryKey: ["bookmarks"] });
-      qc.invalidateQueries({ queryKey: ["bookmark", story.slug] });
+      qc.invalidateQueries({ queryKey: ["bookmark", storySlug] });
     },
     onError: (e: Error) => toast.error(e.message || "Xoá thất bại"),
   });
@@ -114,13 +124,13 @@ function BookmarkCard({ item }: { item: BookmarkItem }) {
     <li className="flex gap-3 rounded-lg border border-border bg-card p-3 transition-colors hover:border-primary/50">
       <Link
         to="/truyen/$slug"
-        params={{ slug: story.slug }}
+        params={{ slug: storySlug }}
         className="shrink-0"
-        aria-label={story.title}
+        aria-label={storyTitle}
       >
         <img
-          src={story.coverImageUrl ?? ""}
-          alt={story.title}
+          src={storyCoverImageUrl ?? ""}
+          alt={storyTitle}
           className="h-32 w-24 rounded-md border border-border object-cover"
           loading="lazy"
         />
@@ -128,28 +138,30 @@ function BookmarkCard({ item }: { item: BookmarkItem }) {
       <div className="flex min-w-0 flex-1 flex-col">
         <Link
           to="/truyen/$slug"
-          params={{ slug: story.slug }}
+          params={{ slug: storySlug }}
           className="line-clamp-2 font-semibold leading-snug hover:text-primary"
         >
-          {story.title}
+          {storyTitle}
         </Link>
-        <p className="mt-0.5 truncate text-xs text-muted-foreground">{story.authorName}</p>
+        <p className="mt-0.5 truncate text-xs text-muted-foreground">{authorName}</p>
 
         <div className="mt-2 flex flex-wrap gap-1">
-          {story.categories.slice(0, 2).map((c) => (
+          {storyCategories.map((c) => (
             <Badge key={c.id} variant="secondary" className="text-[10px]">
               {c.name}
             </Badge>
           ))}
-          {hasUnread && <Badge className="text-[10px]">+{total - current} chương mới</Badge>}
+          {hasUnread && (
+            <Badge className="text-[10px]">+{totalChapters - current} chương mới</Badge>
+          )}
         </div>
 
-        <div className="mt-2 text-xs text-muted-foreground">
-          {lastReadChapterNumber ? (
+        {/* <div className="mt-2 text-xs text-muted-foreground">
+          {lastReadChapter ? (
             <span className="line-clamp-1">
               Đang đọc:{" "}
               <span className="text-foreground">
-                Chương {lastReadChapterNumber}
+                Chương {lastReadChapter}
                 {lastReadChapterTitle ? ` — ${lastReadChapterTitle}` : ""}
               </span>
             </span>
@@ -161,15 +173,15 @@ function BookmarkCard({ item }: { item: BookmarkItem }) {
               <Clock className="h-3 w-3" /> {new Date(lastReadAt).toLocaleString("vi-VN")}
             </span>
           )}
-        </div>
+        </div> */}
 
-        {total > 0 && (
+        {totalChapters > 0 && (
           <div className="mt-2">
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
               <div className="h-full bg-primary transition-all" style={{ width: `${pct}%` }} />
             </div>
             <p className="mt-1 text-[11px] text-muted-foreground">
-              {current}/{total} chương ({pct}%)
+              {current}/{totalChapters} chương ({pct}%)
             </p>
           </div>
         )}
@@ -178,10 +190,10 @@ function BookmarkCard({ item }: { item: BookmarkItem }) {
           <Button variant="greenShiny" asChild size="sm" className="flex-1">
             <Link
               to="/truyen/$slug/chuong-{$number}"
-              params={{ slug: story.slug, number: String(nextChapter) }}
+              params={{ slug: storySlug, number: String(nextChapter) }}
             >
               <BookOpen className="mr-1 h-3.5 w-3.5" />
-              {lastReadChapterNumber ? "Tiếp tục đọc" : "Đọc từ đầu"}
+              {lastReadChapter ? "Tiếp tục đọc" : "Đọc từ đầu"}
               <ChevronRight className="ml-auto h-3.5 w-3.5" />
             </Link>
           </Button>

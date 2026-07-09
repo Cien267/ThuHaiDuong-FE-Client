@@ -6,7 +6,7 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { STORIES, STATUS_LABEL, COUNTRY_LABEL, formatViews } from "@/features/stories/mock-data";
 import { storyQuery, chaptersQuery } from "@/features/stories/api";
-import { addBookmark, bookmarkStatusQuery, removeBookmark } from "@/features/library/api";
+import { bookmarkStatusQuery, toggleBookmark } from "@/features/library/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { GlobalAffiliate, PopupAffiliate, SidebarAffiliate } from "@/features/affiliate/components";
 import { StoryReviews } from "@/features/stories/components/StoryReview";
+import { isAuthenticated } from "@/features/library/api";
 
 export const Route = createFileRoute("/truyen/$slug/")({
   head: ({ params }) => {
@@ -212,7 +213,7 @@ function StoryDetailPage() {
                       </Link>
                     </Button>
                   )}
-                  <BookmarkButton slug={story.slug} />
+                  {isAuthenticated() && <BookmarkButton slug={story.slug} id={story.id} />}
                 </div>
               </div>
             </div>
@@ -343,11 +344,11 @@ function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; va
   );
 }
 
-function BookmarkButton({ slug }: { slug: string }) {
+function BookmarkButton({ slug, id }: { slug: string; id: string }) {
   const qc = useQueryClient();
   const { data: marked } = useQuery(bookmarkStatusQuery(slug));
   const mut = useMutation({
-    mutationFn: () => (marked ? removeBookmark(slug) : addBookmark(slug)),
+    mutationFn: () => toggleBookmark(id),
     onSuccess: () => {
       toast.success(marked ? "Đã xoá khỏi tủ sách" : "Đã thêm vào tủ sách");
       qc.invalidateQueries({ queryKey: ["bookmark", slug] });
@@ -357,7 +358,7 @@ function BookmarkButton({ slug }: { slug: string }) {
   });
   return (
     <Button
-      variant={marked ? "secondary" : "outline"}
+      variant={marked ? "greenGlass" : "outline"}
       onClick={() => mut.mutate()}
       disabled={mut.isPending}
     >
