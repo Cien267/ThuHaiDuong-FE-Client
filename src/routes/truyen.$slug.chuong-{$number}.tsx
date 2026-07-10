@@ -88,7 +88,7 @@ function ChapterReaderPage() {
 
   // Ghi nhận tiến độ đọc (forward-only, best-effort) + tracking view
   useEffect(() => {
-    if (chapter) void updateProgress(slug, chapter.chapterNumber, chapter.title);
+    if (chapter) void updateProgress(storyId, chapter.chapterNumber, chapter.id);
   }, [slug, chapter]);
 
   useEffect(() => {

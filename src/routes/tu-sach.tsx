@@ -156,24 +156,25 @@ function BookmarkCard({ item }: { item: BookmarkItem }) {
           )}
         </div>
 
-        {/* <div className="mt-2 text-xs text-muted-foreground">
+        <div className="mt-2 text-xs text-muted-foreground">
           {lastReadChapter ? (
             <span className="line-clamp-1">
               Đang đọc:{" "}
               <span className="text-foreground">
-                Chương {lastReadChapter}
-                {lastReadChapterTitle ? ` — ${lastReadChapterTitle}` : ""}
+                Chương {lastReadChapter.chapterNumber}
+                {lastReadChapter.chapterTitle ? ` — ${lastReadChapter.chapterTitle}` : ""}
               </span>
             </span>
           ) : (
             <span>Chưa bắt đầu đọc</span>
           )}
-          {lastReadAt && (
+          {lastReadChapter?.lastReadAt && (
             <span className="mt-0.5 flex items-center gap-1">
-              <Clock className="h-3 w-3" /> {new Date(lastReadAt).toLocaleString("vi-VN")}
+              <Clock className="h-3 w-3" />{" "}
+              {new Date(lastReadChapter.lastReadAt).toLocaleString("vi-VN")}
             </span>
           )}
-        </div> */}
+        </div>
 
         {totalChapters > 0 && (
           <div className="mt-2">

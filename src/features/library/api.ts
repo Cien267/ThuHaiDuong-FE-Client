@@ -65,13 +65,17 @@ export async function isBookmarked(storySlug: string): Promise<boolean> {
 
 /** Ghi nhận tiến độ — chỉ tiến lên, backend là nguồn sự thật. Best-effort. */
 export async function updateProgress(
-  storySlug: string,
+  storyId: string,
   chapterNumber: number,
-  chapterTitle?: string,
+  chapterId?: string,
 ): Promise<void> {
   if (!isAuthenticated()) return;
   try {
-    await api.post(`/stories/${storySlug}/progress`, { chapterNumber });
+    await api.put(`/reading-progress`, {
+      storyId: storyId,
+      chapterId: chapterId,
+      chapterNumber: chapterNumber,
+    });
   } catch {
     /* best-effort — backend sẽ tự enforce chỉ-tiến-lên */
   }
