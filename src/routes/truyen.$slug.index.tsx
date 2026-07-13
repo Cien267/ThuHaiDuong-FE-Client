@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { GlobalAffiliate, PopupAffiliate, SidebarAffiliate } from "@/features/affiliate/components";
 import { StoryReviews } from "@/features/stories/components/StoryReview";
-import { isAuthenticated } from "@/features/library/api";
+import { isAuthenticated, deleteProgress } from "@/features/library/api";
 
 export const Route = createFileRoute("/truyen/$slug/")({
   head: ({ params }) => {
@@ -65,6 +65,7 @@ function NotFoundView() {
 function StoryDetailPage() {
   const { slug } = Route.useParams();
   const storyQ = useQuery(storyQuery(slug));
+  const navigate = useNavigate();
 
   const chaptersQ = useQuery({
     ...chaptersQuery(storyQ.data?.id ?? ""),
@@ -128,6 +129,17 @@ function StoryDetailPage() {
 
   const firstChapter = allChapters[0];
   const latestChapter = allChapters[allChapters.length - 1];
+
+  const handleReadFirstChapter = () => {
+    navigate({
+      to: "/truyen/$slug/chuong-{$number}",
+      params: {
+        slug: story.slug,
+        number: String(firstChapter.chapterNumber),
+      },
+    });
+    void deleteProgress(story.id);
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -194,13 +206,8 @@ function StoryDetailPage() {
                 </div>
                 <div className="mt-6 flex flex-wrap gap-3">
                   {firstChapter && (
-                    <Button variant="greenShiny" asChild>
-                      <Link
-                        to="/truyen/$slug/chuong-{$number}"
-                        params={{ slug: story.slug, number: String(firstChapter.chapterNumber) }}
-                      >
-                        <BookOpen className="mr-2 h-4 w-4" /> Đọc từ đầu
-                      </Link>
+                    <Button variant="greenShiny" onClick={handleReadFirstChapter}>
+                      <BookOpen className="mr-2 h-4 w-4" /> Đọc từ đầu
                     </Button>
                   )}
                   {latestChapter && (

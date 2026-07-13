@@ -81,6 +81,15 @@ export async function updateProgress(
   }
 }
 
+export async function deleteProgress(storyId: string): Promise<void> {
+  if (!isAuthenticated()) return;
+  try {
+    await api.delete(`/reading-history/${storyId}`, {});
+  } catch {
+    /* best-effort — backend sẽ tự enforce chỉ-tiến-lên */
+  }
+}
+
 // ====== Query options ======
 
 export const bookmarksQuery = () =>
