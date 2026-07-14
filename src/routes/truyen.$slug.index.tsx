@@ -21,10 +21,12 @@ import {
   Search,
   ChevronRight,
   RefreshCw,
+  CheckIcon,
 } from "lucide-react";
 import { GlobalAffiliate, PopupAffiliate, SidebarAffiliate } from "@/features/affiliate/components";
 import { StoryReviews } from "@/features/stories/components/StoryReview";
-import { isAuthenticated, deleteProgress } from "@/features/library/api";
+import { isAuthenticated, deleteProgress, readingHistoryQuery } from "@/features/library/api";
+import { read } from "fs";
 
 export const Route = createFileRoute("/truyen/$slug/")({
   head: ({ params }) => {
@@ -71,6 +73,13 @@ function StoryDetailPage() {
     ...chaptersQuery(storyQ.data?.id ?? ""),
     enabled: !!storyQ.data?.id,
   });
+
+  const readingHistoryQ = useQuery({
+    ...readingHistoryQuery(storyQ.data?.id ?? ""),
+    enabled: !!storyQ.data?.id,
+  });
+
+  const readChapterIds = readingHistoryQ.data ?? [];
 
   const [keyword, setKeyword] = useState("");
   const [page, setPage] = useState(1);
@@ -294,7 +303,12 @@ function StoryDetailPage() {
                   params={{ slug: story.slug, number: String(ch.chapterNumber) }}
                   className="flex items-center justify-between rounded px-3 py-2 text-sm hover:bg-accent"
                 >
-                  <span className="truncate">{ch.title}</span>
+                  <span className="flex items-center min-w-0">
+                    <span className="truncate">{ch.title}</span>
+                    {readChapterIds.includes(ch?.id ?? "") && (
+                      <CheckIcon className="h-4 text-green-600" />
+                    )}
+                  </span>
                   <span className="ml-2 shrink-0 text-xs text-muted-foreground">
                     {new Date(ch.publishedAt).toLocaleDateString("vi-VN")}
                   </span>

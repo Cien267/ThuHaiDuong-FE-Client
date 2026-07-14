@@ -63,6 +63,16 @@ export async function isBookmarked(storySlug: string): Promise<boolean> {
 
 // ====== Reading progress ======
 
+export async function fetchReadingHistory(storyId: string): Promise<string[]> {
+  try {
+    const { data } = await api.get(`/reading-history/${storyId}/chapters`, {});
+    return Array.isArray(data) ? data : (data.items ?? []);
+  } catch (err) {
+    if (!isBackendUnavailable(err)) throw err;
+    return [];
+  }
+}
+
 /** Ghi nhận tiến độ — chỉ tiến lên, backend là nguồn sự thật. Best-effort. */
 export async function updateProgress(
   storyId: string,
@@ -96,6 +106,13 @@ export const bookmarksQuery = () =>
   queryOptions({
     queryKey: ["bookmarks"],
     queryFn: fetchBookmarks,
+    staleTime: 30_000,
+  });
+
+export const readingHistoryQuery = (storyId: string) =>
+  queryOptions({
+    queryKey: ["reading-history", storyId],
+    queryFn: () => fetchReadingHistory(storyId),
     staleTime: 30_000,
   });
 

@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 import { ChapterSummary, getChapter } from "@/features/stories/chapters";
 import { chapterQuery, chaptersQuery, storyQuery } from "@/features/stories/api";
-import { updateProgress } from "@/features/library/api";
+import { updateProgress, readingHistoryQuery } from "@/features/library/api";
 import { sanitizeChapterHtml } from "@/features/reader/sanitize";
 import {
   useReaderSettings,
@@ -23,7 +23,16 @@ import {
 } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronLeft, ChevronRight, Settings2, List, Home, ArrowUp, RefreshCw } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Settings2,
+  List,
+  Home,
+  ArrowUp,
+  RefreshCw,
+  CheckIcon,
+} from "lucide-react";
 import {
   GlobalAffiliate,
   InChapterAffiliate,
@@ -83,6 +92,10 @@ function ChapterReaderPage() {
   const chapter = chapterQ.data ?? null;
 
   const chapterId = chapter?.id ?? "";
+
+  const readingHistoryQ = useQuery(readingHistoryQuery(storyId));
+
+  const readChapterIds = readingHistoryQ.data ?? [];
 
   const sanitized = useMemo(() => (chapter ? sanitizeChapterHtml(chapter.content) : ""), [chapter]);
 
@@ -195,6 +208,7 @@ function ChapterReaderPage() {
               chapters={chapters}
               isPending={chaptersQ.isPending}
               currentNumber={chapter.chapterNumber}
+              readChapterIds={readChapterIds}
             />
             <ReaderSettingsPopover settings={settings} setSettings={setSettings} />
           </div>
@@ -311,11 +325,13 @@ function ChapterListSheet({
   chapters,
   isPending,
   currentNumber,
+  readChapterIds = [],
 }: {
   storySlug: string;
   chapters: ChapterSummary[];
   isPending: boolean;
   currentNumber: number;
+  readChapterIds: string[];
 }) {
   return (
     <Sheet>
@@ -342,9 +358,12 @@ function ChapterListSheet({
                   <Link
                     to="/truyen/$slug/chuong-{$number}"
                     params={{ slug: storySlug, number: String(c.chapterNumber) }}
-                    className={`block rounded px-3 py-2 text-sm hover:bg-accent ${c.chapterNumber === currentNumber ? "bg-accent font-semibold" : ""}`}
+                    className={`flex rounded px-3 py-2 text-sm hover:bg-accent ${c.chapterNumber === currentNumber ? "bg-accent font-semibold" : ""}`}
                   >
                     {c.title}
+                    {readChapterIds.includes(c?.id ?? "") && (
+                      <CheckIcon className="h-4 text-green-600" />
+                    )}
                   </Link>
                 </li>
               ))}
