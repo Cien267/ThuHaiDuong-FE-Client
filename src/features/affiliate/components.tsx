@@ -180,7 +180,7 @@ export function GlobalAffiliate({ storyId, chapterId }: Ctx) {
 }
 
 /* ============================ POPUP ============================ */
-const POPUP_DELAY_MS = 30_000;
+const POPUP_DELAY_MS = 10_000;
 function popupShownKey(id: string) {
   return `aff:shown:popup:${id}`;
 }
@@ -214,35 +214,27 @@ export function PopupAffiliate({ storyId, chapterId }: Ctx) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-w-md p-0 overflow-hidden">
-        <div className="px-5 pt-5">
-          <AdLabel />
-        </div>
-        {link.imageUrl && (
-          <img
-            src={link.imageUrl}
-            alt=""
-            loading="lazy"
-            className="mt-3 aspect-video w-full object-cover"
-          />
-        )}
-        <div className="space-y-3 p-5">
-          <DialogTitle className="text-lg">{link.name}</DialogTitle>
-          {link.description ? (
-            <DialogDescription>{link.description}</DialogDescription>
-          ) : (
-            <DialogDescription className="sr-only">{link.name}</DialogDescription>
-          )}
-          <div className="flex justify-end gap-2 pt-1">
-            <Button variant="ghost" onClick={() => setOpen(false)}>
-              Để sau
-            </Button>
-            <Button variant="greenShiny" asChild>
-              <AdAnchor link={link} chapterId={chapterId}>
-                {link.ctaText || "Tìm hiểu thêm"} <ExternalLink className="ml-1 h-4 w-4" />
-              </AdAnchor>
-            </Button>
+        <AdAnchor link={link} chapterId={chapterId}>
+          <div className="px-5 pt-5">
+            <AdLabel />
           </div>
-        </div>
+          {link.imageUrl && (
+            <img
+              src={link.imageUrl}
+              alt=""
+              loading="lazy"
+              className="mt-3 aspect-video w-full object-cover"
+            />
+          )}
+          <div className="space-y-3 p-5">
+            <DialogTitle className="text-lg">{link.name}</DialogTitle>
+            {link.description ? (
+              <DialogDescription>{link.description}</DialogDescription>
+            ) : (
+              <DialogDescription className="sr-only">{link.name}</DialogDescription>
+            )}
+          </div>
+        </AdAnchor>
       </DialogContent>
     </Dialog>
   );
